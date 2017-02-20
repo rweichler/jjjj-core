@@ -8,45 +8,15 @@ objc = require 'objc'
 ffi = require 'ffi'
 C = ffi.C
 bit = require 'bit'
+require 'cdef'
+require 'util'
 
-if ffi.arch == 'arm64' then
-    ffi.cdef'typedef double CGFloat;'
-else
-    ffi.cdef'typedef float CGFloat;'
+for _,fname in ipairs(ls(PATH..'/class')) do
+    if string.sub(fname, #fname - 3, #fname) == '.lua' then
+        require('class.'..string.sub(fname, 1, #fname - 4))
+    elseif isdir(PATH..'/'..fname) then
+        require('class.'..fname)
+    end
 end
-
-ffi.cdef[[
-struct CGPoint {
-    CGFloat x;
-    CGFloat y;
-};
-struct CGSize {
-    CGFloat width;
-    CGFloat height;
-};
-struct CGRect {
-    struct CGPoint origin;
-    struct CGSize size;
-};
-
-int UIApplicationMain(int argc, char **argv, id principalClassName, id appDelegateClassName);
-void dpkg_syslog(const char *);
-]]
-
-function CGRectMake(x, y, w, h)
-    local rect = ffi.new('struct CGRect')
-    rect.origin.x = x
-    rect.origin.y = y
-    rect.size.width = w
-    rect.size.height = h
-    return rect
-end
-
-function print(str)
-    C.dpkg_syslog(tostring(str))
-end
-
-require 'class.AppDelegate'
-require 'class.ViewController'
 
 return C.UIApplicationMain(argc, argv, nil, objc.toobj('AppDelegate'))
