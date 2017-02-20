@@ -11,6 +11,9 @@ bit = require 'bit'
 require 'cdef'
 require 'util'
 
+Object = require 'object'
+Pkg = require 'package'
+
 for _,fname in ipairs(ls(PATH..'/class')) do
     if string.sub(fname, #fname - 3, #fname) == '.lua' then
         require('class.'..string.sub(fname, 1, #fname - 4))
