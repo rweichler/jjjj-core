@@ -14,8 +14,11 @@ function Deb:select(nav)
             select = function(t, nav)
                 local cmd = 'dpkg --remove '..self.Package
                 print(cmd)
-                os.execute(cmd)
+                local s, status = os.capture(cmd)
+                print(string.gsub(s, '\n', ' '))
                 nav[#nav] = nil
+                nav[1] = Deb.List()
+                C.alert_display(status == 0 and 'Success' or 'Failed', s, 'Okay', nil, nil)
                 return true
             end
         }
@@ -28,7 +31,8 @@ function Deb.List()
 
     local deb
     local function deblol()
-        if deb and deb.Status == 'install ok installed' then
+        local ok = 'ok installed'
+        if deb and string.sub(deb.Status, #deb.Status - #ok + 1, #deb.Status) == ok then
             t[#t + 1] = deb
         end
     end

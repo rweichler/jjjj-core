@@ -65,11 +65,16 @@ function isdir(path)
         return true
     end
 end
-function os.capture(cmd)
-  local f = assert(io.popen(cmd, 'r'))
-  local s = assert(f:read('*a'))
-  f:close()
-  return string.sub(s, 1, #s - 1)
+function os.capture(cmd, noerr)
+    local f
+    if noerr then
+        f = assert(io.open(cmd, 'r'))
+    else
+        f = assert(io.popen(cmd..' 2>&1', 'r'))
+    end
+    local s = assert(f:read('*a'))
+    local rc = {f:close()}
+    return string.sub(s, 1, #s - 1), rc[3]
 end
 
 
