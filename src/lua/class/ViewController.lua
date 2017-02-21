@@ -40,6 +40,7 @@ end
 
 function class:viewDidLoad()
     local tableView = objc.UITableView:alloc():init()
+    TABLE_VIEW = tableView
     local frame = objc.UIScreen:mainScreen().bounds
     frame.origin.y = frame.origin.y + 20
     frame.size.height = frame.size.height - 20

@@ -12,14 +12,17 @@ function Deb:select(nav)
         {
             Name = 'Uninstall',
             select = function(t, nav)
-                local cmd = 'dpkg --remove '..self.Package
-                print(cmd)
-                local s, status = os.capture(cmd)
-                print(string.gsub(s, '\n', ' '))
-                nav[#nav] = nil
-                nav[1] = Deb.List()
-                C.alert_display(status == 0 and 'Success' or 'Failed', s, 'Okay', nil, nil)
-                return true
+                C.alert_display('Are you sure?', '', 'Cancel', 'Uninstall', function()
+                    local cmd = 'dpkg --remove '..self.Package
+                    print(cmd)
+                    local s, status = os.capture(cmd)
+                    print(string.gsub(s, '\n', ' '))
+                    nav[#nav] = nil
+                    nav[1] = Deb.List()
+                    C.alert_display(status == 0 and 'Success' or 'Failed', s, 'Okay', nil, nil)
+                    TABLE_VIEW:reloadData()
+
+                end)
             end
         }
     }
