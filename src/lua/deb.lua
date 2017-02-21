@@ -1,20 +1,18 @@
-local Object = require 'object'
-
 local super = Object
-local Pkg = Object.new(super)
+local Deb = Object.new(super)
 
-function Pkg:new(...)
+function Deb:new(...)
     local self = super.new(self, ...)
     return self
 end
 
-function Pkg.List()
+function Deb.List()
     local t = {}
 
-    local pkg
-    local function addpkg()
-        if pkg and pkg.Status == 'install ok installed' then
-            t[#t + 1] = pkg
+    local deb
+    local function deblol()
+        if deb and deb.Status == 'install ok installed' then
+            t[#t + 1] = deb
         end
     end
 
@@ -23,15 +21,18 @@ function Pkg.List()
         local _, _, k, v = string.find(line, '(.*): (.*)')
         if k and v then
             if k == 'Package' then
-                addpkg()
-                pkg = Pkg:new()
+                deblol()
+                deb = Deb:new()
             end
-            pkg[k] = v
+            deb[k] = v
         end
     end
     f:close()
-    addpkg()
+    deblol()
+    table.sort(t, function(a, b)
+        return a.Package < b.Package
+    end)
     return t
 end
 
-return Pkg
+return Deb

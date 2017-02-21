@@ -65,3 +65,19 @@ function isdir(path)
         return true
     end
 end
+
+
+local fs = {}
+fs.WIDTH = function()
+    return objc.UIScreen:mainScreen().bounds.size.width
+end
+fs.HEIGHT = function()
+    return objc.UIScreen:mainScreen().bounds.size.height
+end
+
+_G.SCREEN = setmetatable({}, {
+    __index = function(t, k)
+        local f = fs[k]
+        if f then return f() end
+    end,
+})

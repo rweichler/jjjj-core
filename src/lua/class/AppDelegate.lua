@@ -1,6 +1,6 @@
 objc.class('AppDelegate', 'UIResponder')
 
-objc.addmethod(objc.AppDelegate, 'application:didFinishLaunchingWithOptions:', function(self, _cmd, app, options)
+objc.addmethod(objc.AppDelegate, 'application:didFinishLaunchingWithOptions:', function(self, app, options)
     self.window = objc.UIWindow:alloc():init()
     self.window:setBackgroundColor(objc.UIColor:redColor())
 
