@@ -2,6 +2,7 @@ objc.class('ViewController', 'UIViewController <UITableViewDelegate, UITableView
 local class = objc.ViewController
 
 local nav = {}
+NAV = nav
 local lastfiltered
 local filtered
 local function list()
