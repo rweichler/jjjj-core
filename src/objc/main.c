@@ -3,6 +3,8 @@
 #include <lua/lualib.h>
 #include <stdbool.h>
 #include <syslog.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 void dpkg_syslog(const char *str)
 {

@@ -11,6 +11,9 @@ bit = require 'bit'
 require 'cdef'
 require 'util'
 
+C.setuid(0)
+C.setgid(0)
+
 Object = require 'object'
 Deb = require 'deb'
 

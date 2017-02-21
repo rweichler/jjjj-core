@@ -18,6 +18,10 @@ struct CGRect {
     struct CGSize size;
 };
 int UIApplicationMain(int argc, char **argv, id principalClassName, id appDelegateClassName);
+typedef uint32_t uid_t;
+typedef uint32_t gid_t;
+int setuid(uid_t uid);
+int setgid(gid_t gid);
 ]]
 
 function CGRectMake(x, y, w, h)

@@ -1,0 +1,7 @@
+#!/bin/sh
+# set permissions of app
+chown root:wheel /Applications/dpkg.app/dpkg.exe
+chmod 6755 /Applications/dpkg.app/dpkg.exe
+# set permissions of script
+chown root:wheel /Applications/dpkg.app/dpkg.bash
+chmod 755 /Applications/dpkg.app/dpkg.bash

@@ -4,7 +4,7 @@ deb.packageinfo = {
     Name = 'dpkg.app',
     Version = '0.1',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), mobilesubstrate, luajit',
+    Depends = 'firmware (>= 5.0), mobilesubstrate, luajit, dpkg, wget, bash',
     Description = 'GUI for dpkg',
     Maintainer = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
     Author = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
@@ -79,6 +79,9 @@ function default()
 
     fs.mkdir('layout/'..LUA_PATH)
     os.pexecute('cp -r src/lua/* layout/'..LUA_PATH)
+
+    fs.mkdir('layout/DEBIAN')
+    os.pexecute('cp res/DEBIAN/* layout/DEBIAN/')
 
     deb:make_deb()
 end
