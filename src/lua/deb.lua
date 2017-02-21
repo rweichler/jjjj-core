@@ -19,7 +19,7 @@ function Deb:select(nav)
                     print(string.gsub(s, '\n', ' '))
                     nav[#nav] = nil
                     nav[1] = Deb.List()
-                    C.alert_display(status == 0 and 'Success' or 'Failed', s, 'Okay', nil, nil)
+                    C.alert_display(status == 0 and 'Done' or 'Failed', s, 'Okay', nil, nil)
                     TABLE_VIEW:reloadData()
 
                 end)

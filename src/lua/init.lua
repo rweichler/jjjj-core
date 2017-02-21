@@ -1,4 +1,3 @@
-jit.off()
 local argc, argv = ...
 package.path = PATH..'/?.lua;'..
                PATH..'/?/init.lua;'..
@@ -11,11 +10,15 @@ bit = require 'bit'
 require 'cdef'
 require 'util'
 
+OLD_UID = C.getuid()
+OLD_GID = C.getgid()
+
 C.setuid(0)
 C.setgid(0)
 
 Object = require 'object'
 Deb = require 'deb'
+
 
 for _,fname in ipairs(ls(PATH..'/class')) do
     if string.sub(fname, #fname - 3, #fname) == '.lua' then

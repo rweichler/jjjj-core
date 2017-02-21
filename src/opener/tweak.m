@@ -23,11 +23,12 @@
         NSString *scheme = [urlString substringToIndex:divide];
         NSString *path = [urlString substringFromIndex:divide];
 
-        NSString *new = [@"dpkgapp://" stringByAppendingString:path];
-        NSLog(@"OH OK THEN %@", new);
-        return [NSURL URLWithString:new];
+        if(![scheme isEqualToString:@"dpkgapp://"]) {
+            NSString *new = [@"dpkgapp://" stringByAppendingString:url.absoluteString];
+            return [NSURL URLWithString:new];
+        }
+
     }
-    NSLog(@"deepkg WAU %@\n", url);
     return nil;
 }
 @end

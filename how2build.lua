@@ -4,7 +4,7 @@ deb.packageinfo = {
     Name = 'dpkg.app',
     Version = '0.1',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), mobilesubstrate, luajit, dpkg, wget, bash',
+    Depends = 'firmware (>= 5.0), mobilesubstrate, dpkg, wget, bash, ws.hbang.libopener',
     Description = 'GUI for dpkg',
     Maintainer = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
     Author = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
@@ -33,7 +33,7 @@ function default()
     }
     b.archs = {
         'armv7',
-        'arm64',
+        --'arm64',
     }
     b.library_dirs = {
         'deps/lib',
@@ -50,7 +50,7 @@ function default()
         DPKGAPP_LUA_PATH = '"'..LUA_PATH..'"',
     }
     b.libraries = {
-        'luajit-5.1.2',
+        'luajit',
         'substrate',
     }
     b.src = table.merge(
@@ -88,8 +88,8 @@ end
 
 function install(iphone)
     iphone = iphone or "iphone"
-    os.pexecute('scp '..deb.output..' '..iphone..':')
-    os.pexecute('ssh '..iphone..' "dpkg -i '..deb.output..'; rm '..deb.output..'"')
+    os.pexecute('scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '..deb.output..' '..iphone..':')
+    os.pexecute('ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '..iphone..' "dpkg -i '..deb.output..'; rm '..deb.output..'"')
 end
 
 function clean()

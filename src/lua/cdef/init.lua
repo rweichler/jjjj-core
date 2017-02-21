@@ -22,6 +22,8 @@ typedef uint32_t uid_t;
 typedef uint32_t gid_t;
 int setuid(uid_t uid);
 int setgid(gid_t gid);
+uid_t getuid();
+gid_t getgid();
 
 typedef void (*alert_callback_t)();
 typedef void (*alert_input_callback_t)(const char *response);

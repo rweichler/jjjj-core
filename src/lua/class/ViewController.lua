@@ -65,6 +65,7 @@ BACK_BUTTON = {
     Name = '<-- back',
     select = function(self, nav)
         nav[#nav] = nil
+        nav[1] = Deb.List()
         return true
     end,
 }
@@ -126,16 +127,16 @@ end, 'v32@0:8@16@24')
 
 objc.addmethod(class, 'searchBarSearchButtonClicked:', function(self, searchBar)
     searchBar:resignFirstResponder()
-end, 'v24@0:8@16')
+end, ffi.arch == 'arm64' and 'v24@0:8@16' or 'v12@0:4@8')
 
 objc.addmethod(class, 'searchBarTextDidBeginEditing:', function(self, searchBar)
     searchBar:setShowsCancelButton_animated(true, true)
-end, 'v24@0:8@16')
+end, ffi.arch == 'arm64' and 'v24@0:8@16' or 'v12@0:4@8')
 
 objc.addmethod(class, 'searchBarTextDidEndEditing:', function(self, searchBar)
     searchBar:setShowsCancelButton_animated(false, true)
-end, 'v24@0:8@16')
+end, ffi.arch == 'arm64' and 'v24@0:8@16' or 'v12@0:4@8')
 
 objc.addmethod(class, 'searchBarCancelButtonClicked:', function(self, searchBar)
     searchBar:resignFirstResponder()
-end, 'v24@0:8@16')
+end, ffi.arch == 'arm64' and 'v24@0:8@16' or 'v12@0:4@8')
