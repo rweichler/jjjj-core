@@ -1,8 +1,31 @@
 objc.class('ViewController', 'UIViewController <UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate>')
 local class = objc.ViewController
 
-local list = Deb.List()
-local filtered = list
+local nav = {}
+local lastfiltered
+local filtered
+local function list()
+    if filtered then
+        if lastfiltered == nav[#nav] then
+            return filtered
+        else
+            filtered = nil
+        end
+    end
+    lastfiltered = nil
+    return nav[#nav]
+end
+
+local function filter(t)
+    filtered = t
+    if filtered then
+        lastfiltered = nav[#nav]
+    else
+        lastfiltered = nil
+    end
+end
+
+nav[#nav + 1] = Deb.List()
 
 local stuff = {}
 local function sstuff(self)
@@ -33,7 +56,26 @@ function class:viewDidLoad()
 end
 
 function class:tableView_numberOfRowsInSection(tableView, section)
-    return #filtered
+    return #list()
+end
+
+BACK_BUTTON = {
+    Name = '<-- back',
+    select = function(self, nav)
+        nav[#nav] = nil
+        return true
+    end,
+}
+
+function class:tableView_didSelectRowAtIndexPath(tableView, indexPath)
+    tableView:deselectRowAtIndexPath_animated(indexPath, true)
+
+    local obj = list()[tonumber(indexPath.row + 1)]
+    if obj and obj.select then
+        if obj:select(nav) then
+            tableView:reloadData()
+        end
+    end
 end
 
 function class:scrollViewDidScroll(scrollView)
@@ -48,7 +90,7 @@ function class:tableView_cellForRowAtIndexPath(tableView, indexPath)
         cell = objc.UITableViewCell:alloc():initWithStyle_reuseIdentifier(3, identifier)
     end
 
-    local deb = filtered[tonumber(indexPath.row + 1)]
+    local deb = list()[tonumber(indexPath.row + 1)]
 
     cell.textLabel:setText(deb.Name or deb.Package)
     cell.detailTextLabel:setText(deb.Description or '')
@@ -57,6 +99,9 @@ function class:tableView_cellForRowAtIndexPath(tableView, indexPath)
 end
 
 local function strfind(s, text)
+    if not s or not text then return end
+    s = string.lower(s)
+    text = string.lower(text)
     local success, found = pcall(string.find, s, text)
     return success and found
 end
@@ -64,14 +109,15 @@ end
 objc.addmethod(class, 'searchBar:textDidChange:', function(self, searchBar, text)
     text = objc.tolua(text)
     if text == '' then
-        filtered = list
+        filter(nil)
     else
-        filtered = {}
-        for k,v in pairs(list) do
+        local t = {}
+        for k,v in pairs(list()) do
             if strfind(v.Name, text) or strfind(v.Package, text) then
-                filtered[#filtered + 1] = v
+                t[#t + 1] = v
             end
         end
+        filter(t)
     end
     sstuff(self).tableView:reloadData()
 end, 'v32@0:8@16@24')
