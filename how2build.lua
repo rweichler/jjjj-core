@@ -38,7 +38,7 @@ function default()
     b.library_dirs = {
         'deps/lib',
     }
-    b.sflags = '-Fdeps/Frameworks'
+    b.sflags = '-Fdeps/Frameworks -mios-version-min=7.0'
     b.frameworks = {
         'Foundation',
         'UIKit',

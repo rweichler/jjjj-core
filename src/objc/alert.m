@@ -20,6 +20,7 @@
         }
         _callback = nil;
     }
+    [alertView release];
 }
 @end
 
@@ -48,7 +49,6 @@ void alert_display(const char *title, const char *msg, const char *cancel, const
     view.delegate = view;
     view->_callback = Block_copy(callback);
     [view show];
-    [view release];
 }
 
 void alert_input(const char *title, const char *msg, const char *cancel, const char *ok, alert_input_callback_t callback)
@@ -64,5 +64,39 @@ void alert_input(const char *title, const char *msg, const char *cancel, const c
     view.delegate = view;
     view->_callback = Block_copy(callback);
     [view show];
-    [view release];
+}
+
+static dispatch_queue_t queue = NULL;
+void pipeit(const char *cmd, void (*callback)(const char *, int))
+{
+    if(queue == NULL) {
+        queue = dispatch_queue_create("OISDJFDSOI", NULL);
+    }
+    dispatch_queue_t oldQueue = dispatch_get_current_queue();
+    dispatch_async(queue, ^{
+
+        FILE *fp;
+        char path[1035];
+
+        /* Open the command for reading. */
+        fp = popen(cmd, "r");
+        if (fp == NULL) {
+            printf("Failed to run command\n" );
+            exit(1);
+        }
+
+        /* Read the output a line at a time - output it. */
+        while (fgets(path, sizeof(path)-1, fp) != NULL) {
+            char *tmp = malloc(strlen(path) + 1);
+            strcpy(tmp, path);
+            dispatch_async(oldQueue, ^{
+                callback(tmp, 0);
+                free(tmp);
+            });
+        }
+        /* close */
+        int status = pclose(fp) / 256;
+        callback(NULL, status);
+
+    });
 }

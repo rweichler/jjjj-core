@@ -49,12 +49,12 @@ function class:viewDidLoad()
     tableView:setDelegate(self)
     tableView:setDataSource(self)
     self.view:addSubview(tableView)
-    sstuff(self).tableView = tableView
+    sstuff(self).tableView = tableView:retain()
 
     local searchBar = objc.UISearchBar:alloc():initWithFrame{{0, 0}, {SCREEN.WIDTH, 44}}
     tableView.tableHeaderView = searchBar
     searchBar:setDelegate(self)
-    sstuff(self).searchBar = searchBar
+    sstuff(self).searchBar = searchBar:retain()
 end
 
 function class:tableView_numberOfRowsInSection(tableView, section)
