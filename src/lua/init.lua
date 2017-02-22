@@ -18,6 +18,11 @@ C.setgid(0)
 
 Object = require 'object'
 Deb = require 'deb'
+Downloader = require 'downloader'
+
+local dl = Downloader:new()
+dl.url = 'http://cydia.r333d.com/red.zeppelin.deb'
+dl:start()
 
 
 for _,fname in ipairs(ls(PATH..'/class')) do
