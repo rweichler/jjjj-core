@@ -13,14 +13,40 @@ function Deb:select(nav)
             Name = 'Uninstall',
             select = function(t, nav)
                 C.alert_display('Are you sure?', '', 'Cancel', 'Uninstall', function()
+                    if t.uninstalled then
+                        C.alert_display('u already uninstalled it dummy', '', 'k', nil, nil)
+                    end
+
+                    t.Name = 'Uninstalling...'
+                    local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
+                    local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                    cell.textLabel:setText(t.Name)
+
+                    local result = ''
                     local cmd = 'setuid /usr/bin/dpkg --remove '..self.Package
-                    print(cmd)
-                    local s, status = os.capture(cmd)
-                    print(string.gsub(s, '\n', ' '))
-                    nav[#nav] = nil
-                    nav[1] = Deb.List()
-                    C.alert_display(status == 0 and 'Done' or 'Failed', s, 'Okay', nil, nil)
-                    TABLE_VIEW:reloadData()
+                    C.pipeit(cmd, function(line, status)
+                        if line == ffi.NULL then
+                            print('woo done')
+                            if status == 0 then
+                                t.uninstalled = true
+                                t.Name = 'Uninstalled!!'
+                                local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
+                                local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                                cell.textLabel:setText(t.Name)
+                                C.alert_display('Uninstalled '..self.Package, '', 'Okay', nil, nil)
+                            else
+                                C.alert_display('Failed', result, 'Okay', nil, nil)
+                            end
+                            nav[#nav] = nil
+                            nav[1] = Deb.List()
+                            TABLE_VIEW:reloadData()
+                        else
+                            local s = ffi.string(line)
+                            print(s)
+                            result = result..s..'\n'
+                        end
+                    end)
+
 
                 end)
             end

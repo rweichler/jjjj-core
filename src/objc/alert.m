@@ -47,8 +47,10 @@ void alert_display(const char *title, const char *msg, const char *cancel, const
                 ];
     }
     view.delegate = view;
-    view->_callback = Block_copy(callback);
-    [view show];
+    view->_callback = callback;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [view show];
+    });
 }
 
 void alert_input(const char *title, const char *msg, const char *cancel, const char *ok, alert_input_callback_t callback)
@@ -62,7 +64,7 @@ void alert_input(const char *title, const char *msg, const char *cancel, const c
                           ];
     view.alertViewStyle = UIAlertViewStylePlainTextInput;
     view.delegate = view;
-    view->_callback = Block_copy(callback);
+    view->_callback = callback;
     [view show];
 }
 
