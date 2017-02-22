@@ -29,7 +29,7 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
             Name = 'Download',
             select = function(t, k)
                 os.execute('rm -f /var/root/TEMP.deb')
-                local s, success = os.capture('wget '..url..' -O /var/root/TEMP.deb')
+                local s, success = os.capture('setuid /usr/bin/wget '..url..' -O /var/root/TEMP.deb')
                 C.alert_display(success and 'Done' or 'Failed', s, 'Okay', nil, nil)
                 downloaded = true
             end
@@ -40,7 +40,7 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
                 if not downloaded then
                     C.alert_display('NOPE', 'Need to download first.', 'Okay', nil, nil)
                 else
-                    local s, success = os.capture('dpkg -i /var/root/TEMP.deb')
+                    local s, success = os.capture('setuid /usr/bin/dpkg -i /var/root/TEMP.deb')
                     s = string.gsub(s, '\n', ' ')
                     C.alert_display(success and 'Done' or 'Failed', s, 'Okay', nil, nil)
                 end

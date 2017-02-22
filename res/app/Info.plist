@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>dpkg.bash</string>
+    <string>dpkg.exe</string>
     <key>CFBundleIdentifier</key>
     <string>dpkg.app</string>
     <key>CFBundleName</key>

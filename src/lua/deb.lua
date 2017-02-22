@@ -13,7 +13,7 @@ function Deb:select(nav)
             Name = 'Uninstall',
             select = function(t, nav)
                 C.alert_display('Are you sure?', '', 'Cancel', 'Uninstall', function()
-                    local cmd = 'dpkg --remove '..self.Package
+                    local cmd = 'setuid /usr/bin/dpkg --remove '..self.Package
                     print(cmd)
                     local s, status = os.capture(cmd)
                     print(string.gsub(s, '\n', ' '))

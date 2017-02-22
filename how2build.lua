@@ -33,12 +33,12 @@ function default()
     }
     b.archs = {
         'armv7',
-        --'arm64',
+        'arm64',
     }
     b.library_dirs = {
         'deps/lib',
     }
-    b.sflags = '-g -mios-version-min=10.0 -Fdeps/Frameworks'
+    b.sflags = '-Fdeps/Frameworks'
     b.frameworks = {
         'Foundation',
         'UIKit',
@@ -50,7 +50,7 @@ function default()
         DPKGAPP_LUA_PATH = '"'..LUA_PATH..'"',
     }
     b.libraries = {
-        'luajit',
+        'luajit-5.1.2',
         'substrate',
     }
     b.src = table.merge(
@@ -70,10 +70,16 @@ function default()
         'Opener',
         'Foundation',
     }
-    b.is_making_dylib = true
     b.output = 'layout/Library/Opener/DpkgOpener.bundle/DpkgOpener'
+    b.is_making_dylib = true
     b:link(b:compile())
+    b.is_making_dylib = nil
     os.pexecute('cp res/opener/* layout/Library/Opener/DpkgOpener.bundle/')
+
+    -- setuid
+    b.src = 'src/setuid/main.c'
+    b.output = 'layout/usr/bin/setuid'
+    b:link(b:compile())
 
     -- Lua
 
