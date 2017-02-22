@@ -115,7 +115,7 @@ objc.addmethod(class, 'searchBar:textDidChange:', function(self, searchBar, text
         filter(nil)
     else
         local t = {}
-        for k,v in pairs(list()) do
+        for k,v in pairs(nav[#nav]) do
             if strfind(v.Name, text) or strfind(v.Package, text) then
                 t[#t + 1] = v
             end
