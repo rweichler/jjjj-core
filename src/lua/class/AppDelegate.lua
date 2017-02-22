@@ -54,6 +54,7 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
                             if status == 0 then
                                 installed = true
                                 t.Name = 'Installed!!!'
+                                os.capture('setuid /bin/rm -f '..downloaded)
                             else
                                 t.Name = 'Install failed :('
                                 C.alert_display('Failed', result, 'Okay', nil, nil)
@@ -87,7 +88,8 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
         if percent then
             t.Name = 'Downloading... '..math.floor(percent*100 + 0.5)..'%'
         elseif url then
-            downloaded = '/var/root/tmp.deb'
+            os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
+            downloaded = CACHE_DIR..'/lastinstalled.deb'
             os.capture('setuid /bin/mv '..url..' '..downloaded)
             t.Name = 'Downloaded!'
         end

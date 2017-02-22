@@ -4,6 +4,7 @@ package.path = PATH..'/?.lua;'..
                PATH..'/?/init.lua;'..
                package.path
 
+config = require 'config'
 objc = require 'objc'
 ffi = require 'ffi'
 C = ffi.C
