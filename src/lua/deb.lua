@@ -41,9 +41,7 @@ function Deb:select(nav)
                             nav[1] = Deb.List()
                             TABLE_VIEW:reloadData()
                         else
-                            local s = ffi.string(line)
-                            print(s)
-                            result = result..s..'\n'
+                            result = result..ffi.string(line)
                         end
                     end)
 

@@ -81,7 +81,11 @@ void pipeit(const char *cmd, void (*callback)(const char *, int))
         char path[1035];
 
         /* Open the command for reading. */
-        fp = popen(cmd, "r");
+        static const char *suffix = " 2>&1";
+        char realcmd[strlen(cmd) + strlen(suffix) + 1];
+        strcpy(realcmd, cmd);
+        strcat(realcmd, suffix);
+        fp = popen(realcmd, "r");
         if (fp == NULL) {
             printf("Failed to run command\n" );
             exit(1);
@@ -98,7 +102,8 @@ void pipeit(const char *cmd, void (*callback)(const char *, int))
         }
         /* close */
         int status = pclose(fp) / 256;
-        callback(NULL, status);
-
+        dispatch_async(oldQueue, ^{
+            callback(NULL, status);
+        });
     });
 }
