@@ -1,14 +1,15 @@
 objc.class('AppDelegate', 'UIResponder')
 local class = objc.AppDelegate
 
+local window, vc
 objc.addmethod(class, 'application:didFinishLaunchingWithOptions:', function(self, app, options)
-    self.window = objc.UIWindow:alloc():init()
-    self.window:setBackgroundColor(objc.UIColor:redColor())
+    window = objc.UIWindow:alloc():init()
+    window:setBackgroundColor(objc.UIColor:whiteColor())
 
-    local vc = objc.ViewController:alloc():init()
-    self.window:setRootViewController(vc)
+    vc = objc.ViewController:alloc():init()
+    window:setRootViewController(vc)
 
-    self.window:makeKeyAndVisible()
+    window:makeKeyAndVisible()
     return true
 end, 'B32@0:8@16@24')
 

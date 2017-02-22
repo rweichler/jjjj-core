@@ -98,6 +98,19 @@ function class:tableView_cellForRowAtIndexPath(tableView, indexPath)
     cell.textLabel:setText(deb.Name or deb.Package)
     cell.detailTextLabel:setText(deb.Description or '')
 
+    local img = nil
+
+    if deb.Section then
+        local path = '/Applications/Cydia.app/Sections/'..string.gsub(deb.Section, ' ', '_')..'.png'
+        local f = io.open(path, 'r')
+        if f then
+            f:close()
+            img = objc.UIImage:imageWithContentsOfFile(path)
+        end
+    end
+
+    cell.imageView:setImage(img)
+
     return cell
 end
 
