@@ -30,7 +30,7 @@ nav[#nav + 1] = Deb.List()
 
 
 local table = ui.table:new()
-table.items = {list()}
+table.items = {}
 table.m:setFrame{{0, 20}, {SCREEN.WIDTH, SCREEN.HEIGHT-20}}
 function table:onscroll(x, y)
     self.searchbar.m:resignFirstResponder()
@@ -39,8 +39,18 @@ end
 table.cell = ui.cell:new()
 table.cell.identifier = objc.toobj('lolwatttt')
 
+
+function table:refresh(...)
+    self.items[1] = list()
+    ui.table.refresh(self, ...)
+end
 function table.cell:onselect(section, row)
     local deb = table.items[section][row]
+    if deb and deb.select then
+        if deb:select(nav) then
+            table:refresh()
+        end
+    end
 end
 function table.cell:mnew()
     return objc.UITableViewCell:alloc():initWithStyle_reuseIdentifier(3, self.identifier)
@@ -84,8 +94,8 @@ function table.searchbar:ontextchange(text)
         end
         filter(t)
     end
-    table.items[1] = list()
     table:refresh()
 end
 
+THE_TABLE = table
 return table.m

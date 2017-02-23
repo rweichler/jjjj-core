@@ -44,8 +44,9 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
                     C.alert_display('NOPE', 'You already installed it!', 'O... okay', nil, nil)
                 else
 
-                    local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
-                    local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                    --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
+                    --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                    local cell = THE_TABLE:getmcell(1, 2)
                     t.Name = 'Installing...'
                     cell.textLabel:setText(t.Name)
                     local result = ''
@@ -60,8 +61,9 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
                                 C.alert_display('Failed', result, 'Okay', nil, nil)
                             end
 
-                            local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
-                            local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                            --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
+                            --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                            local cell = THE_TABLE:getmcell(1, 2)
                             cell.textLabel:setText(t.Name)
                         else
                             result = result..ffi.string(str)..'\n'
@@ -78,7 +80,7 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
         },
     }
 
-    TABLE_VIEW:reloadData()
+    THE_TABLE:refresh()
 
     local dl = Downloader:new()
     dl.url = url
@@ -93,8 +95,9 @@ objc.addmethod(class, 'application:openURL:sourceApplication:annotation:', funct
             os.capture('setuid /bin/mv '..url..' '..downloaded)
             t.Name = 'Downloaded!'
         end
-        local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
-        local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+        local cell = THE_TABLE:getmcell(1, 2)
+        --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
+        --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
         cell.textLabel:setText(t.Name)
     end
     dl:start()

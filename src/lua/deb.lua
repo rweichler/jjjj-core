@@ -18,8 +18,7 @@ function Deb:select(nav)
                     end
 
                     t.Name = 'Uninstalling...'
-                    local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
-                    local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                    local cell = THE_TABLE:getmcell(1, 2)
                     cell.textLabel:setText(t.Name)
 
                     local result = ''
@@ -30,8 +29,7 @@ function Deb:select(nav)
                             if status == 0 then
                                 t.uninstalled = true
                                 t.Name = 'Uninstalled!!'
-                                local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
-                                local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                                local cell = THE_TABLE:getmcell(1, 2)
                                 cell.textLabel:setText(t.Name)
                                 C.alert_display('Uninstalled '..self.Package, '', 'Okay', nil, nil)
                             else
@@ -39,7 +37,7 @@ function Deb:select(nav)
                             end
                             nav[#nav] = nil
                             nav[1] = Deb.List()
-                            TABLE_VIEW:reloadData()
+                            THE_TABLE:refresh()
                         else
                             result = result..ffi.string(line)
                         end
