@@ -40,6 +40,7 @@ local function sstuff(self)
 end
 
 function class:viewDidLoad()
+--[[
     local tableView = objc.UITableView:alloc():init()
     TABLE_VIEW = tableView
     local frame = objc.UIScreen:mainScreen().bounds
@@ -55,6 +56,8 @@ function class:viewDidLoad()
     tableView.tableHeaderView = searchBar
     searchBar:setDelegate(self)
     sstuff(self).searchBar = searchBar:retain()
+]]
+    self.view:addSubview(require('main'))
 end
 
 function class:tableView_numberOfRowsInSection(tableView, section)

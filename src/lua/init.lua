@@ -6,6 +6,31 @@ package.path = PATH..'/?.lua;'..
 
 config = require 'config'
 objc = require 'objc'
+local count = 0
+function objc.Class(super, ...)
+    super = super or 'NSObject'
+    count = count + 1
+    local name = 'DPKGAPP_'..count..super
+
+    if ... then
+        objc.class(name, super..'<'..table.concat({...}, ',')..'>')
+    else
+         objc.class(name, super)
+    end
+
+    return objc[name]
+end
+local objc_objz = {}
+function objc.Lua(obj, set)
+    local hash = tonumber(ffi.cast('uintptr_t',obj))
+    local result = objc_objz[hash]
+    if set then
+        if result then error('wtf???') end
+        objc_objz[hash] = set
+        result = set
+    end
+    return result
+end
 ffi = require 'ffi'
 C = ffi.C
 bit = require 'bit'
@@ -21,6 +46,11 @@ C.setgid(0)
 Object = require 'object'
 Deb = require 'deb'
 Downloader = require 'downloader'
+
+ui = {}
+require 'ui.table'
+require 'ui.cell'
+require 'ui.searchbar'
 
 for _,fname in ipairs(ls(PATH..'/class')) do
     if string.sub(fname, #fname - 3, #fname) == '.lua' then
