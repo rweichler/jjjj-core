@@ -1,5 +1,36 @@
+local nav = {}
+NAV = nav
+local lastfiltered
+local filtered
+local function list()
+    if filtered then
+        if lastfiltered == nav[#nav] then
+            return filtered
+        else
+            filtered = nil
+        end
+    end
+    lastfiltered = nil
+    return nav[#nav]
+end
+
+local function filter(t)
+    filtered = t
+    if filtered then
+        lastfiltered = nav[#nav]
+    else
+        lastfiltered = nil
+    end
+end
+
+nav[#nav + 1] = Deb.List()
+
+
+
+
+
 local table = ui.table:new()
-table.items = {Deb.List()}
+table.items = {list()}
 table.m:setFrame{{0, 20}, {SCREEN.WIDTH, SCREEN.HEIGHT-20}}
 function table:onscroll(x, y)
     self.searchbar.m:resignFirstResponder()
@@ -8,7 +39,7 @@ end
 table.cell = ui.cell:new()
 table.cell.identifier = objc.toobj('lolwatttt')
 
-function ui.cell:onselect(section, row)
+function table.cell:onselect(section, row)
     local deb = table.items[section][row]
 end
 function table.cell:mnew()
@@ -37,6 +68,10 @@ table.searchbar = ui.searchbar:new()
 table.searchbar.m:setFrame{{0, 0}, {SCREEN.WIDTH, 44}}
 table.m.tableHeaderView = table.searchbar.m
 
+local function strfind(s, text)
+    if not s or not text then return end
+    return string.find(string.lower(s), string.lower(text))
+end
 function table.searchbar:ontextchange(text)
     if text == '' then
         filter(nil)
@@ -49,6 +84,7 @@ function table.searchbar:ontextchange(text)
         end
         filter(t)
     end
+    table.items[1] = list()
     table:refresh()
 end
 
