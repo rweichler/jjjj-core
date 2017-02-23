@@ -37,7 +37,6 @@ nav[#nav + 1] = Deb.List()
 
 local table = ui.table:new()
 table.items = {}
-table.m:setFrame{{0, 0}, {SCREEN.WIDTH, SCREEN.HEIGHT}}
 function table:onscroll(x, y)
     self.searchbar.m:resignFirstResponder()
 end
@@ -104,17 +103,17 @@ function table.searchbar:ontextchange(text)
     table:refresh()
 end
 
-THE_TABLE = table
+_G.THE_TABLE = table
 
-local window, nvc, vc
-window = objc.UIWindow:alloc():init():retain()
-window:setBackgroundColor(objc.UIColor:whiteColor())
+local window = objc.UIWindow:alloc():init():retain()
 
-vc = objc.UIViewController:alloc():init()
-nvc = objc.UINavigationController:alloc():initWithRootViewController(vc)
-window:setRootViewController(nvc:retain())
+local vc = VIEWCONTROLLER(function(self)
+    table.m:setFrame{{0, 0}, {self.view:frame().size.width, self.view:frame().size.height}}
+    self.view:addSubview(table.m)
+end)
 
-vc.view:addSubview(table.m)
+_G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(vc)
+window:setRootViewController(NAVCONTROLLER:retain())
 window:makeKeyAndVisible()
 
 function OPENURL(url)

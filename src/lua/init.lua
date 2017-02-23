@@ -31,6 +31,16 @@ function objc.Lua(obj, set)
     end
     return result
 end
+
+function VIEWCONTROLLER(callback)
+    local self = objc.Class('UIViewController'):alloc():init()
+    if callback then
+        function self:viewDidLoad()
+            callback(self)
+        end
+    end
+    return self
+end
 ffi = require 'ffi'
 C = ffi.C
 bit = require 'bit'
