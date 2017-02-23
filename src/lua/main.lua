@@ -1,4 +1,4 @@
-BACK_BUTTON = {
+_G.BACK_BUTTON = {
     Name = '<-- back',
     select = function(self, nav)
         nav[#nav] = nil
@@ -8,7 +8,7 @@ BACK_BUTTON = {
 }
 
 local nav = {}
-NAV = nav
+_G.NAV = nav
 local lastfiltered
 local filtered
 local function list()
@@ -116,7 +116,7 @@ _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControlle
 window:setRootViewController(NAVCONTROLLER:retain())
 window:makeKeyAndVisible()
 
-function OPENURL(url)
+_G.OPENURL = function(url)
     for k,v in pairs(NAV) do
         NAV[k] = nil
     end

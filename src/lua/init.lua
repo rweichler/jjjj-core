@@ -62,12 +62,19 @@ require 'ui.table'
 require 'ui.cell'
 require 'ui.searchbar'
 
-for _,fname in ipairs(ls(PATH..'/class')) do
-    if string.sub(fname, #fname - 3, #fname) == '.lua' then
-        require('class.'..string.sub(fname, 1, #fname - 4))
-    elseif isdir(PATH..'/'..fname) then
-        require('class.'..fname)
-    end
-end
+objc.class('AppDelegate', 'UIResponder')
+
+objc.addmethod(objc.AppDelegate, 'application:didFinishLaunchingWithOptions:', function(self, app, options)
+    require 'main'
+    return true
+end, 'B32@0:8@16@24')
+
+
+objc.addmethod(objc.AppDelegate, 'application:openURL:sourceApplication:annotation:', function(self, app, url, sourceApp, annotation)
+    url = objc.tolua(url.absoluteString)
+    url = string.sub(url, #'dpkgapp://' + 1, #url)
+    OPENURL(url)
+    return true
+end, ffi.arch == 'arm64' and 'B48@0:8@16@24@32@40' or 'B24@0:4@8@12@16@20')
 
 return C.UIApplicationMain(argc, argv, nil, objc.toobj('AppDelegate'))
