@@ -1,3 +1,12 @@
+BACK_BUTTON = {
+    Name = '<-- back',
+    select = function(self, nav)
+        nav[#nav] = nil
+        nav[1] = Deb.List()
+        return true
+    end,
+}
+
 local nav = {}
 NAV = nav
 local lastfiltered
@@ -24,9 +33,6 @@ local function filter(t)
 end
 
 nav[#nav + 1] = Deb.List()
-
-
-
 
 
 local table = ui.table:new()
@@ -57,6 +63,7 @@ function table.cell:mnew()
 end
 function table.cell:onshow(m, section, row)
     local deb = table.items[section][row]
+    if not deb then return end
 
     local img = nil
     if deb.Section then
