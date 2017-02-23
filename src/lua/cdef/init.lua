@@ -33,6 +33,24 @@ void pipeit(const char *cmd, void (*callback)(const char *, int));
 
 ]]
 
+UIControlEventTouchDown         = bit.lshift(1, 0)
+UIControlEventTouchDownRepeat   = bit.lshift(1, 1)
+UIControlEventTouchDragInside   = bit.lshift(1, 2)
+UIControlEventTouchDragOutside  = bit.lshift(1, 3)
+UIControlEventTouchDragEnter    = bit.lshift(1, 4)
+UIControlEventTouchDragExit     = bit.lshift(1, 5)
+UIControlEventTouchUpInside     = bit.lshift(1, 6)
+UIControlEventTouchUpOutside    = bit.lshift(1, 7)
+UIControlEventTouchCancel       = bit.lshift(1, 8)
+
+UIControlStateNormal            = 0
+UIControlStateHighlighted       = bit.lshift(1, 0)
+UIControlStateDisabled          = bit.lshift(1, 1)
+UIControlStateSelected          = bit.lshift(1, 2)
+UIControlStateFocused           = bit.lshift(1, 3)
+UIControlStateApplication       = 0x00FF0000
+UIControlStateReserved          = 0xFF000000
+
 function CGRectMake(x, y, w, h)
     local rect = ffi.new('struct CGRect')
     rect.origin.x = x

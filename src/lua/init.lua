@@ -32,8 +32,9 @@ function objc.Lua(obj, set)
     return result
 end
 
-function VIEWCONTROLLER(callback)
+function VIEWCONTROLLER(callback, title)
     local self = objc.Class('UIViewController'):alloc():init()
+    self:setTitle(title or '')
     if callback then
         function self:viewDidLoad()
             callback(self)
@@ -56,11 +57,13 @@ C.setgid(0)
 Object = require 'object'
 Deb = require 'deb'
 Downloader = require 'downloader'
+Depiction = require 'depiction'
 
 ui = {}
 require 'ui.table'
 require 'ui.cell'
 require 'ui.searchbar'
+require 'ui.button'
 
 objc.class('AppDelegate', 'UIResponder')
 

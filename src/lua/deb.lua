@@ -6,49 +6,8 @@ function Deb:new(...)
     return self
 end
 
-function Deb:select(nav)
-    nav[#nav + 1] = {
-        BACK_BUTTON,
-        {
-            Name = 'Uninstall',
-            select = function(t, nav)
-                C.alert_display('Are you sure?', '', 'Cancel', 'Uninstall', function()
-                    if t.uninstalled then
-                        C.alert_display('u already uninstalled it dummy', '', 'k', nil, nil)
-                    end
-
-                    t.Name = 'Uninstalling...'
-                    local cell = THE_TABLE:getmcell(1, 2)
-                    cell.textLabel:setText(t.Name)
-
-                    local result = ''
-                    local cmd = 'setuid /usr/bin/dpkg --remove '..self.Package
-                    C.pipeit(cmd, function(line, status)
-                        if line == ffi.NULL then
-                            print('woo done')
-                            if status == 0 then
-                                t.uninstalled = true
-                                t.Name = 'Uninstalled!!'
-                                local cell = THE_TABLE:getmcell(1, 2)
-                                cell.textLabel:setText(t.Name)
-                                C.alert_display('Uninstalled '..self.Package, '', 'Okay', nil, nil)
-                            else
-                                C.alert_display('Failed', result, 'Okay', nil, nil)
-                            end
-                            nav[#nav] = nil
-                            nav[1] = Deb.List()
-                            THE_TABLE:refresh()
-                        else
-                            result = result..ffi.string(line)
-                        end
-                    end)
-
-
-                end)
-            end
-        }
-    }
-    return true
+function Deb:uninstall(f)
+    C.pipeit('setuid /usr/bin/dpkg --remove '..self.Package, f)
 end
 
 function Deb.List()
