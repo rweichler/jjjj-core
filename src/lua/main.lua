@@ -37,7 +37,7 @@ nav[#nav + 1] = Deb.List()
 
 local table = ui.table:new()
 table.items = {}
-table.m:setFrame{{0, 20}, {SCREEN.WIDTH, SCREEN.HEIGHT-20}}
+table.m:setFrame{{0, 0}, {SCREEN.WIDTH, SCREEN.HEIGHT}}
 function table:onscroll(x, y)
     self.searchbar.m:resignFirstResponder()
 end
@@ -105,4 +105,100 @@ function table.searchbar:ontextchange(text)
 end
 
 THE_TABLE = table
-return table.m
+
+local window, nvc, vc
+window = objc.UIWindow:alloc():init():retain()
+window:setBackgroundColor(objc.UIColor:whiteColor())
+
+vc = objc.UIViewController:alloc():init()
+nvc = objc.UINavigationController:alloc():initWithRootViewController(vc)
+window:setRootViewController(nvc:retain())
+
+vc.view:addSubview(table.m)
+window:makeKeyAndVisible()
+
+function OPENURL(url)
+    for k,v in pairs(NAV) do
+        NAV[k] = nil
+    end
+
+    local downloaded = false
+    local installed = false
+
+    NAV[1] = {
+        BACK_BUTTON,
+        {
+            Name = 'Downloading...',
+            select = function(t, k)
+                --local s, success = os.capture('setuid /usr/bin/wget '..url..' -O /var/root/TEMP.deb')
+                --C.alert_display(success and 'Done' or 'Failed', s, 'Okay', nil, nil)
+                --downloaded = true
+            end
+        },
+        {
+            Name = 'Install',
+            select = function(t, k)
+                if not downloaded then
+                    C.alert_display('NOPE', 'Need to download first.', 'Okay', nil, nil)
+                elseif installed then
+                    C.alert_display('NOPE', 'You already installed it!', 'O... okay', nil, nil)
+                else
+
+                    --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
+                    --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                    local cell = THE_TABLE:getmcell(1, 2)
+                    t.Name = 'Installing...'
+                    cell.textLabel:setText(t.Name)
+                    local result = ''
+                    C.pipeit('setuid /usr/bin/dpkg -i '..downloaded, function(str, status)
+                        if str == ffi.NULL then
+                            if status == 0 then
+                                installed = true
+                                t.Name = 'Installed!!!'
+                                os.capture('setuid /bin/rm -f '..downloaded)
+                            else
+                                t.Name = 'Install failed :('
+                                C.alert_display('Failed', result, 'Okay', nil, nil)
+                            end
+
+                            --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
+                            --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+                            local cell = THE_TABLE:getmcell(1, 2)
+                            cell.textLabel:setText(t.Name)
+                        else
+                            result = result..ffi.string(str)..'\n'
+                        end
+                    end)
+
+                    --[[
+                    local s, success = os.capture('setuid /usr/bin/dpkg -i '..downloaded)
+                    s = string.gsub(s, '\n', ' ')
+                    C.alert_display(success and 'Done' or 'Failed', s, 'Okay', nil, nil)
+                    ]]
+                end
+            end
+        },
+    }
+
+    THE_TABLE:refresh()
+
+    local dl = Downloader:new()
+    dl.url = url
+    print(dl.url)
+    function dl:handler(url, percent, err)
+        local t = NAV[1][2]
+        if percent then
+            t.Name = 'Downloading... '..math.floor(percent*100 + 0.5)..'%'
+        elseif url then
+            os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
+            downloaded = CACHE_DIR..'/lastinstalled.deb'
+            os.capture('setuid /bin/mv '..url..' '..downloaded)
+            t.Name = 'Downloaded!'
+        end
+        local cell = THE_TABLE:getmcell(1, 2)
+        --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(1, 0)
+        --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
+        cell.textLabel:setText(t.Name)
+    end
+    dl:start()
+end
