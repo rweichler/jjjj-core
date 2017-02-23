@@ -145,7 +145,7 @@ _G.OPENURL = function(url)
 
                     --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
                     --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
-                    local cell = THE_TABLE:getmcell(1, 2)
+                    local cell = THE_TABLE:getmcell(1, 3)
                     t.Name = 'Installing...'
                     cell.textLabel:setText(t.Name)
                     local result = ''
@@ -162,7 +162,7 @@ _G.OPENURL = function(url)
 
                             --local indexPath = objc.NSIndexPath:indexPathForRow_inSection(2, 0)
                             --local cell = TABLE_VIEW:cellForRowAtIndexPath(indexPath)
-                            local cell = THE_TABLE:getmcell(1, 2)
+                            local cell = THE_TABLE:getmcell(1, 3)
                             cell.textLabel:setText(t.Name)
                         else
                             result = result..ffi.string(str)..'\n'
@@ -186,7 +186,9 @@ _G.OPENURL = function(url)
     print(dl.url)
     function dl:handler(url, percent, err)
         local t = NAV[1][2]
-        if percent then
+        if err then
+            print('WHOA '..err)
+        elseif percent then
             t.Name = 'Downloading... '..math.floor(percent*100 + 0.5)..'%'
         elseif url then
             os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
