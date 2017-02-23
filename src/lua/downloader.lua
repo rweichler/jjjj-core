@@ -36,14 +36,14 @@ objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', func
     local url = objc.tolua(url.description)
     url = string.sub(url, #'file://' + 1, #url)
     this:handler(url)
-end, 'v40@0:8@16@24@32')
+end, ffi.arch == 'arm64' and 'v40@0:8@16@24@32' or 'v20@0:4@8@12@16')
 
 objc.addmethod(class, 'URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:', function(self, session, task, data, bytesWritten, totalBytes)
     local this = objc.Lua(self)
     local percent = tonumber(bytesWritten)/tonumber(totalBytes)
 
     this:handler(nil, percent)
-end, 'v56@0:8@16@24Q32Q40Q48')
+end, ffi.arch == 'arm64' and 'v56@0:8@16@24Q32Q40Q48' or 'v28@0:4@8@12Q16Q20Q24')
 
 function class:URLSession_task_didCompleteWithError(self, task, err)
     local this = objc.Lua(self)
