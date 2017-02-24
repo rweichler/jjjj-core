@@ -66,6 +66,7 @@ require 'ui.table'
 require 'ui.cell'
 require 'ui.searchbar'
 require 'ui.button'
+require 'ui.gesture'
 
 objc.class('AppDelegate', 'UIResponder')
 
