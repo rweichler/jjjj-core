@@ -1,3 +1,13 @@
+local olderror = error
+function error(...)
+    local a, b, c, d, e, f, g, h, j, i = ...
+    local success, err = xpcall(function()
+        olderror(a, b, c, d, e, f, g, h, i)
+    end, debug.traceback)
+    olderror(string.gsub(err, '\n', '\ndeepkg   '))
+end
+
+
 if jit.arch == 'arm64' then
     jit.off()
 end
@@ -77,7 +87,12 @@ end, ffi.arch == 'arm64' and 'B32@0:8@16@24' or 'B16@0:4@8@12')
 
 
 objc.addmethod(objc.AppDelegate, 'application:openURL:sourceApplication:annotation:', function(self, app, url, sourceApp, annotation)
-    url = objc.tolua(url.absoluteString)
+    -- TODO fix objc.lua
+    if type(url.absoluteString) == 'function' then
+        url = objc.tolua(url:absoluteString())
+    else
+        url = objc.tolua(url.absoluteString)
+    end
     url = string.sub(url, #'dpkgapp://' + 1, #url)
     OPENURL(url)
     return true

@@ -32,7 +32,14 @@ local class = Downloader.class
 objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', function(self, session, task, url)
     local this = objc.Lua(self)
 
-    local url = objc.tolua(url.description)
+    local description
+    -- TODO fix objc.lua
+    if type(url.description) == 'function' then
+        description = url:description()
+    else
+        description = url.description
+    end
+    local url = objc.tolua(description)
     url = string.sub(url, #'file://' + 1, #url)
     this:handler(url)
 end, ffi.arch == 'arm64' and 'v40@0:8@16@24@32' or 'v20@0:4@8@12@16')
@@ -44,11 +51,12 @@ objc.addmethod(class, 'URLSession:downloadTask:didWriteData:totalBytesWritten:to
     this:handler(nil, percent)
 end, ffi.arch == 'arm64' and 'v56@0:8@16@24Q32Q40Q48' or 'v28@0:4@8@12Q16Q20Q24')
 
-objc.addmethod(class, 'URLSession:task:didCompleteWithError:', function(self, task, err)
+objc.addmethod(class, 'URLSession:task:didCompleteWithError:', function(self, session, task, err)
     local this = objc.Lua(self)
 
-    if not(err == ffi.NULL) then
-        this:handler(nil, nil, objc.tolua(err.localizedDescription))
+    if err and not(err == ffi.NULL) then
+        local desc = err.description
+        this:handler(nil, nil, objc.tolua(desc))
     end
 end, ffi.arch == 'arm64' and 'v32@0:8@16@24' or 'v16@0:4@8@12')
 
