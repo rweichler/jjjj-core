@@ -4,8 +4,24 @@ _G.OPENURL = function(url)
     PUSHCONTROLLER(function(m)
         m:view():setBackgroundColor(objc.UIColor:whiteColor())
         local padding = 44
-        progress:setFrame{{padding,88},{m:view():frame().size.width-padding*2, 22}}
+        progress:setFrame{{padding, m:view():frame().size.height/2},{m:view():frame().size.width-padding*2, 22}}
         m:view():addSubview(progress)
+
+        local downloadingLabel = objc.UILabel:alloc():initWithFrame{{padding, progress:frame().origin.y + 11},{20,20}}
+        downloadingLabel:setText('Downloading...')
+        downloadingLabel:setFont(downloadingLabel:font():fontWithSize(10))
+        downloadingLabel:sizeToFit()
+        m:view():addSubview(downloadingLabel)
+
+        local percentLabel = objc.UILabel:alloc():initWithFrame{{0, progress:frame().origin.y + 11},{20,20}}
+        percentLabel:setText('000%')
+        percentLabel:setFont(percentLabel:font():fontWithSize(10))
+        percentLabel:sizeToFit()
+        local x = progress:frame().origin.x + progress:frame().size.width - percentLabel:frame().size.width
+        percentLabel:setFrame{{x, percentLabel:frame().origin.y},percentLabel:frame().size}
+        percentLabel:setTextAlignment(NSTextAlignmentRight)
+        percentLabel:setText('0%')
+        m:view():addSubview(percentLabel)
 
         local dl = Downloader:new()
         dl.url = url
@@ -14,8 +30,11 @@ _G.OPENURL = function(url)
                 print('WHOA '..err)
             elseif percent then
                 progress:setProgress(percent)
+                percentLabel:setText(math.floor(percent*100 + 0.5)..'%')
             elseif url then
                 progress:removeFromSuperview()
+                downloadingLabel:removeFromSuperview()
+                percentLabel:removeFromSuperview()
                 os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
                 local path = CACHE_DIR..'/lastinstalled.deb'
                 os.capture('setuid /bin/mv '..url..' '..path)
@@ -48,13 +67,5 @@ _G.OPENURL = function(url)
             end
         end
         dl:start()
-
-
-
-
-
     end, 'Install deb')
-
-
 end
-

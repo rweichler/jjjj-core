@@ -40,6 +40,9 @@ objc.addmethod(class, 'URLSession:downloadTask:didWriteData:totalBytesWritten:to
     local this = objc.Lua(self)
     local percent = tonumber(bytesWritten)/tonumber(totalBytes)
 
+    if not this.totalbytes then
+        this.totalbytes = totalBytes
+    end
     this:handler(nil, percent)
 end, ffi.arch == 'arm64' and 'v56@0:8@16@24Q32Q40Q48' or 'v28@0:4@8@12Q16Q20Q24')
 

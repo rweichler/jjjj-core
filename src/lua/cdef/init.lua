@@ -33,6 +33,12 @@ void pipeit(const char *cmd, void (*callback)(const char *, int));
 
 ]]
 
+NSTextAlignmentLeft      = 0    -- Visually left aligned
+NSTextAlignmentCenter    = 1    -- Visually centered
+NSTextAlignmentRight     = 2    -- Visually right aligned
+NSTextAlignmentJustified = 3    -- Fully-justified. The last line in a paragraph is natural-aligned.
+NSTextAlignmentNatural   = 4    -- Indicates the default alignment for script
+
 UIProgressViewStyleDefault      = 0
 UIBarButtonItemStylePlain       = 0
 
