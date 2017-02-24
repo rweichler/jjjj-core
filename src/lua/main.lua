@@ -122,7 +122,7 @@ end
 
 _G.THE_TABLE = table
 
-local window = objc.UIWindow:alloc():init():retain()
+local window = objc.UIWindow:alloc():initWithFrame(objc.UIScreen:mainScreen().bounds):retain()
 
 local vc = VIEWCONTROLLER(function(m)
     local size = m.view:frame().size
