@@ -1,3 +1,8 @@
+if jit.arch == 'arm64' then
+    -- arm64 JIT not stable
+    jit.off()
+end
+
 local olderror = error
 function error(...)
     local a, b, c, d, e, f, g, h, j, i = ...
@@ -7,10 +12,6 @@ function error(...)
     olderror(string.gsub(err, '\n', '\ndeepkg   '))
 end
 
-
-if jit.arch == 'arm64' then
-    jit.off()
-end
 local argc, argv = ...
 package.path = PATH..'/?.lua;'..
                PATH..'/?/init.lua;'..
@@ -73,6 +74,9 @@ require 'ui.cell'
 require 'ui.searchbar'
 require 'ui.button'
 require 'ui.gesture'
+
+ns = {}
+require 'ns.target'
 
 objc.class('AppDelegate', 'UIResponder')
 

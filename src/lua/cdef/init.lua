@@ -34,6 +34,7 @@ void pipeit(const char *cmd, void (*callback)(const char *, int));
 ]]
 
 UIProgressViewStyleDefault      = 0
+UIBarButtonItemStylePlain       = 0
 
 UIControlEventTouchDown         = bit.lshift(1, 0)
 UIControlEventTouchDownRepeat   = bit.lshift(1, 1)

@@ -34,14 +34,14 @@ function Depiction:load(m)
         m:view():addSubview(label)
     end
 
-    local button = ui.button:new()
-    button.m:setFrame{{20,120},{70, 44}}
-    button:setTitle('Uninstall')
-    m:view():addSubview(button.m)
-    function button.ontoggle()
+    local target = ns.target:new()
+    local button = objc.UIBarButtonItem:alloc():initWithTitle_style_target_action('Uninstall', UIBarButtonItemStylePlain, target.m, target.sel)
+    m:navigationItem():setRightBarButtonItem(button)
+
+    function target.onaction()
         C.alert_display('Uninstall', 'Do you really want to uninstall '..self.deb.Package..'?', 'Cancel', 'Uninstall', function()
-            local old = button.ontoggle
-            button.ontoggle = function() end
+            local old = target.onaction
+            target.onaction = function() end
             button:setTitle('Uninstalling...')
             local result = ''
             self.deb:uninstall(function(line, status)
@@ -54,7 +54,7 @@ function Depiction:load(m)
                         C.alert_display('Uninstalled '..self.deb.Package, 'Woooooo!', 'Dismiss', nil, nil)
                     else
                         C.alert_display('Failed to uninstall '..self.deb.Package, result, 'Dismiss', nil, nil)
-                        button.ontoggle = old
+                        button.onaction = old
                         button:setTitle('Uninstall')
                     end
                 else

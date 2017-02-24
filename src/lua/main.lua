@@ -101,8 +101,10 @@ function table.cell:onshow(m, section, row)
         local f = io.open(path, 'r')
         if f then
             f:close()
-            img = objc.UIImage:imageWithContentsOfFile(path)
+        else
+            path = '/Applications/Cydia.app/unknown.png'
         end
+        img = objc.UIImage:imageWithContentsOfFile(path)
     end
 
     m:imageView():setImage(img)
