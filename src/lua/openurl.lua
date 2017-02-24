@@ -4,12 +4,12 @@ _G.OPENURL = function(url)
     local button = ui.button:new()
     button:setTitle('Downloading...')
     PUSHCONTROLLER(function(m)
-        m.view:setBackgroundColor(objc.UIColor:whiteColor())
+        m:view():setBackgroundColor(objc.UIColor:whiteColor())
         local padding = 44
-        progress:setFrame{{padding,88},{m.view:frame().size.width-padding*2, 22}}
-        m.view:addSubview(progress)
+        progress:setFrame{{padding,88},{m:view():frame().size.width-padding*2, 22}}
+        m:view():addSubview(progress)
         button.m:setFrame{{padding,120},{120,44}}
-        m.view:addSubview(button.m)
+        m:view():addSubview(button.m)
     end, 'Install deb')
 
 

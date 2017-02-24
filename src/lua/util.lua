@@ -80,10 +80,10 @@ end
 
 local fs = {}
 fs.WIDTH = function()
-    return objc.UIScreen:mainScreen().bounds.size.width
+    return objc.UIScreen:mainScreen():bounds().size.width
 end
 fs.HEIGHT = function()
-    return objc.UIScreen:mainScreen().bounds.size.height
+    return objc.UIScreen:mainScreen():bounds().size.height
 end
 
 _G.SCREEN = setmetatable({}, {

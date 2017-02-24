@@ -17,7 +17,14 @@ package.path = PATH..'/?.lua;'..
                package.path
 
 config = require 'config'
+ffi = require 'ffi'
+C = ffi.C
+bit = require 'bit'
 objc = require 'objc'
+
+require 'util'
+require 'cdef'
+
 local count = 0
 function objc.Class(super, ...)
     super = super or 'NSObject'
@@ -45,26 +52,15 @@ function objc.Lua(obj, set)
 end
 
 function VIEWCONTROLLER(callback, title)
-    local self = objc.Class('UIViewController'):alloc():init()
-    self:setTitle(title or '')
+    local m = objc.Class('UIViewController'):alloc():init()
+    m:setTitle(title or '')
     if callback then
-        function self:viewDidLoad()
-            callback(self)
+        function m:viewDidLoad()
+            callback(m)
         end
     end
-    return self
+    return m
 end
-ffi = require 'ffi'
-C = ffi.C
-bit = require 'bit'
-require 'cdef'
-require 'util'
-
-OLD_UID = C.getuid()
-OLD_GID = C.getgid()
-
-C.setuid(0)
-C.setgid(0)
 
 Object = require 'object'
 Deb = require 'deb'
@@ -87,12 +83,7 @@ end, ffi.arch == 'arm64' and 'B32@0:8@16@24' or 'B16@0:4@8@12')
 
 
 objc.addmethod(objc.AppDelegate, 'application:openURL:sourceApplication:annotation:', function(self, app, url, sourceApp, annotation)
-    -- TODO fix objc.lua
-    if type(url.absoluteString) == 'function' then
-        url = objc.tolua(url:absoluteString())
-    else
-        url = objc.tolua(url.absoluteString)
-    end
+    url = objc.tolua(url:absoluteString())
     url = string.sub(url, #'dpkgapp://' + 1, #url)
     OPENURL(url)
     return true

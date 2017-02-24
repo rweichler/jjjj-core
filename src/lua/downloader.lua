@@ -32,14 +32,7 @@ local class = Downloader.class
 objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', function(self, session, task, url)
     local this = objc.Lua(self)
 
-    local description
-    -- TODO fix objc.lua
-    if type(url.description) == 'function' then
-        description = url:description()
-    else
-        description = url.description
-    end
-    local url = objc.tolua(description)
+    local url = objc.tolua(url:description())
     url = string.sub(url, #'file://' + 1, #url)
     this:handler(url)
 end, ffi.arch == 'arm64' and 'v40@0:8@16@24@32' or 'v20@0:4@8@12@16')

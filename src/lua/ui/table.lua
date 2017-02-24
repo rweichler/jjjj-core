@@ -35,7 +35,7 @@ local class = ui.table.class
 
 function class:tableView_didSelectRowAtIndexPath(tableView, indexPath)
     local this = objc.Lua(self)
-    local section, row = tonumber(indexPath.section) + 1, tonumber(indexPath.row) + 1
+    local section, row = tonumber(indexPath:section()) + 1, tonumber(indexPath:row()) + 1
 
     local cell = this:getcell(section, row)
     cell:onselect(section, row)
@@ -46,7 +46,7 @@ end
 
 function class:tableView_heightForRowAtIndexPath(tableView, indexPath)
     local this = objc.Lua(self)
-    local section, row = tonumber(indexPath.section) + 1, tonumber(indexPath.row) + 1
+    local section, row = tonumber(indexPath:section()) + 1, tonumber(indexPath:row()) + 1
 
     local cell = this:getcell(section, row)
     return cell:getheight(section, row)
@@ -67,12 +67,12 @@ end
 
 function class:scrollViewDidScroll(scrollView)
     local this = objc.Lua(self)
-    this:onscroll(self.contentOffset.x, self.contentOffset.y)
+    this:onscroll(self:contentOffset().x, self:contentOffset().y)
 end
 
 function class:tableView_cellForRowAtIndexPath(tableView, indexPath)
     local this = objc.Lua(self)
-    local section, row = tonumber(indexPath.section) + 1, tonumber(indexPath.row) + 1
+    local section, row = tonumber(indexPath:section()) + 1, tonumber(indexPath:row()) + 1
 
     local cell = this:getcell(section, row)
     local m = self:dequeueReusableCellWithIdentifier(cell.identifier)
@@ -85,7 +85,7 @@ end
 
 function class:tableView_willDisplayCell_forRowAtIndexPath(tableView, mcell, indexPath)
     local this = objc.Lua(self)
-    local section, row = tonumber(indexPath.section) + 1, tonumber(indexPath.row) + 1
+    local section, row = tonumber(indexPath:section()) + 1, tonumber(indexPath:row()) + 1
 
     local cell = this:getcell(section, row)
     cell:onshow(mcell, section, row)

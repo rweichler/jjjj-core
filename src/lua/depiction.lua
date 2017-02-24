@@ -23,7 +23,7 @@ function Depiction:getauthor()
 end
 
 function Depiction:load(m)
-    m.view:setBackgroundColor(objc.UIColor:whiteColor())
+    m:view():setBackgroundColor(objc.UIColor:whiteColor())
 
     local author = self:getauthor()
     if author then
@@ -31,13 +31,13 @@ function Depiction:load(m)
         label:setFrame{{20, 80},{60,44}}
         label:setText('by '..self:getauthor())
         label:sizeToFit()
-        m.view:addSubview(label)
+        m:view():addSubview(label)
     end
 
     local button = ui.button:new()
     button.m:setFrame{{20,120},{70, 44}}
     button:setTitle('Uninstall')
-    m.view:addSubview(button.m)
+    m:view():addSubview(button.m)
     function button.ontoggle()
         C.alert_display('Uninstall', 'Do you really want to uninstall '..self.deb.Package..'?', 'Cancel', 'Uninstall', function()
             local old = button.ontoggle

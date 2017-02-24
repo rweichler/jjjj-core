@@ -52,7 +52,7 @@ table.cell = ui.cell:new()
 table.cell.identifier = objc.toobj('lolwatttt')
 
 function table:updatefilter(text)
-    text = text or (self.searchbar and objc.tolua(self.searchbar.m.text) or '')
+    text = text or (self.searchbar and objc.tolua(self.searchbar.m:text()) or '')
     if text == '' then
         filter(nil)
     else
@@ -105,15 +105,15 @@ function table.cell:onshow(m, section, row)
         end
     end
 
-    m.imageView:setImage(img)
-    m.textLabel:setText(deb.Name or deb.Package)
-    m.detailTextLabel:setText(deb.Description or '')
+    m:imageView():setImage(img)
+    m:textLabel():setText(deb.Name or deb.Package)
+    m:detailTextLabel():setText(deb.Description or '')
 end
 table:refresh()
 
 table.searchbar = ui.searchbar:new()
 table.searchbar.m:setFrame{{0, 0}, {SCREEN.WIDTH, 44}}
-table.m.tableHeaderView = table.searchbar.m
+table.m:setTableHeaderView(table.searchbar.m)
 
 function table.searchbar:ontextchange(text)
     table:updatefilter(text)
@@ -122,12 +122,12 @@ end
 
 _G.THE_TABLE = table
 
-local window = objc.UIWindow:alloc():initWithFrame(objc.UIScreen:mainScreen().bounds):retain()
+local window = objc.UIWindow:alloc():initWithFrame(objc.UIScreen:mainScreen():bounds()):retain()
 
 local vc = VIEWCONTROLLER(function(m)
-    local size = m.view:frame().size
+    local size = m:view():frame().size
     table.m:setFrame{{0, 0}, {size.width, size.height}}
-    m.view:addSubview(table.m)
+    m:view():addSubview(table.m)
 end, 'Your tweaks')
 
 _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(vc)
