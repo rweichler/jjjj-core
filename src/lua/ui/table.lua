@@ -29,8 +29,7 @@ end
 function ui.table:onscroll(x, y)
 end
 
-ui.table.mname = 'UITableView'
-ui.table.class = objc.Class(ui.table.mname, 'UITableViewDelegate', 'UITableViewDataSource', 'UIScrollViewDelegate')
+ui.table.class = objc.GenerateClass('UITableView', 'UITableViewDelegate', 'UITableViewDataSource', 'UIScrollViewDelegate')
 local class = ui.table.class
 
 function class:tableView_didSelectRowAtIndexPath(tableView, indexPath)

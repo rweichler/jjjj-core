@@ -25,8 +25,7 @@ end
 function Downloader:handler(url, status, err)
 end
 
-Downloader.mname = 'NSObject'
-Downloader.class = objc.Class(Downloader.mname)
+Downloader.class = objc.GenerateClass()
 local class = Downloader.class
 
 objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', function(self, session, task, url)

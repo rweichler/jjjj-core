@@ -18,8 +18,7 @@ end
 function ui.searchbar:oncancel()
 end
 
-ui.searchbar.mname = 'UISearchBar'
-ui.searchbar.class = objc.Class(ui.searchbar.mname)
+ui.searchbar.class = objc.GenerateClass('UISearchBar')
 local class = ui.searchbar.class
 
 objc.addmethod(class, 'searchBar:textDidChange:', function(self, searchBar, text)

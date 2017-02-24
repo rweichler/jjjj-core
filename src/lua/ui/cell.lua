@@ -18,8 +18,7 @@ function ui.cell:mnew()
     error('not implemented')
 end
 
-ui.cell.mname = 'UITableViewCell'
-ui.cell.class = objc.Class(ui.cell.mname)
+ui.cell.class = objc.GenerateClass('UITableViewCell')
 local class = ui.cell.class
 
 return ui.cell

@@ -23,7 +23,7 @@ function ui.gesture:onevent()
 end
 
 newmproxy = function(self)
-    local class = objc.Class() -- create a new class just for this instance
+    local class = objc.GenerateClass()
     objc.addmethod(class, methodname, function()
         self:onevent()
     end, ffi.arch == 'arm64' and 'v24@0:8@16' or 'v12@0:4@8')

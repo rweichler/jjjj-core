@@ -26,7 +26,7 @@ require 'util'
 require 'cdef'
 
 local count = 0
-function objc.Class(super, ...)
+function objc.GenerateClass(super, ...)
     super = super or 'NSObject'
     count = count + 1
     local name = 'DPKGAPP_'..count..super
@@ -52,7 +52,7 @@ function objc.Lua(obj, set)
 end
 
 function VIEWCONTROLLER(callback, title)
-    local m = objc.Class('UIViewController'):alloc():init()
+    local m = objc.GenerateClass('UIViewController'):alloc():init()
     m:setTitle(title or '')
     if callback then
         function m:viewDidLoad()

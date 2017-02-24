@@ -128,7 +128,7 @@ local vc = VIEWCONTROLLER(function(m)
     local size = m:view():frame().size
     table.m:setFrame{{0, 0}, {size.width, size.height}}
     m:view():addSubview(table.m)
-end, 'Your tweaks')
+end, 'Installed')
 
 _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(vc)
 window:setRootViewController(NAVCONTROLLER:retain())

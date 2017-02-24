@@ -41,8 +41,7 @@ end
 function ui.button:ondrag(inside)
 end
 
-ui.button.mname = 'UIButton'
-ui.button.class = objc.Class(ui.button.mname)
+ui.button.class = objc.GenerateClass('UIButton')
 local class = ui.button.class
 
 local function addmethod(flag, f)
