@@ -43,14 +43,16 @@ nav[#nav + 1] = Deb.List()
 local table = ui.table:new()
 table.items = {}
 function table:onscroll(x, y)
-    self.searchbar.m:resignFirstResponder()
+    if self.searchbar then
+        self.searchbar.m:resignFirstResponder()
+    end
 end
 
 table.cell = ui.cell:new()
 table.cell.identifier = objc.toobj('lolwatttt')
 
 function table:updatefilter(text)
-    text = text or objc.tolua(self.searchbar.m.text)
+    text = text or (self.searchbar and objc.tolua(self.searchbar.m.text) or '')
     if text == '' then
         filter(nil)
     else
@@ -69,7 +71,9 @@ function table:refresh(...)
     ui.table.refresh(self, ...)
 end
 function table.cell:onselect(section, row)
-    table.searchbar.m:resignFirstResponder()
+    if self.searchbar then
+        table.searchbar.m:resignFirstResponder()
+    end
     local item = table.items[section][row]
     if item and item.select then
         if item:select(nav) then
@@ -120,9 +124,10 @@ _G.THE_TABLE = table
 
 local window = objc.UIWindow:alloc():init():retain()
 
-local vc = VIEWCONTROLLER(function(self)
-    table.m:setFrame{{0, 0}, {self.view:frame().size.width, self.view:frame().size.height}}
-    self.view:addSubview(table.m)
+local vc = VIEWCONTROLLER(function(m)
+    local size = m.view:frame().size
+    table.m:setFrame{{0, 0}, {size.width, size.height}}
+    m.view:addSubview(table.m)
 end, 'Your tweaks')
 
 _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(vc)

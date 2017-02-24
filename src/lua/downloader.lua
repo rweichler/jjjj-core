@@ -26,8 +26,7 @@ function Downloader:handler(url, status, err)
 end
 
 Downloader.mname = 'NSObject'
-objc.addprotocol('NSURLSessionDownloadDelegate')
-Downloader.class = objc.Class(Downloader.mname, 'NSURLSessionTaskDelegate', 'NSURLSessionDelegate', 'NSURLSessionDownloadDelegate')
+Downloader.class = objc.Class(Downloader.mname)
 local class = Downloader.class
 
 objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', function(self, session, task, url)
@@ -45,12 +44,12 @@ objc.addmethod(class, 'URLSession:downloadTask:didWriteData:totalBytesWritten:to
     this:handler(nil, percent)
 end, ffi.arch == 'arm64' and 'v56@0:8@16@24Q32Q40Q48' or 'v28@0:4@8@12Q16Q20Q24')
 
-function class:URLSession_task_didCompleteWithError(self, task, err)
+objc.addmethod(class, 'URLSession:task:didCompleteWithError:', function(self, task, err)
     local this = objc.Lua(self)
 
     if not(err == ffi.NULL) then
         this:handler(nil, nil, objc.tolua(err.localizedDescription))
     end
-end
+end, ffi.arch == 'arm64' and 'v32@0:8@16@24' or 'v16@0:4@8@12')
 
 return Downloader

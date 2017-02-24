@@ -1,4 +1,6 @@
-jit.off()
+if jit.arch == 'arm64' then
+    jit.off()
+end
 local argc, argv = ...
 package.path = PATH..'/?.lua;'..
                PATH..'/?/init.lua;'..
@@ -70,7 +72,7 @@ objc.class('AppDelegate', 'UIResponder')
 objc.addmethod(objc.AppDelegate, 'application:didFinishLaunchingWithOptions:', function(self, app, options)
     require 'main'
     return true
-end, 'B32@0:8@16@24')
+end, ffi.arch == 'arm64' and 'B32@0:8@16@24' or 'B16@0:4@8@12')
 
 
 objc.addmethod(objc.AppDelegate, 'application:openURL:sourceApplication:annotation:', function(self, app, url, sourceApp, annotation)
