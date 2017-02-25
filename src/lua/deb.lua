@@ -1,39 +1,96 @@
 local super = Object
 local Deb = Object.new(super)
 
-function Deb:new(path, oncomplete)
+function Deb:newfromurl(url, oncomplete, onprogress)
+    local self = self:new()
+    local dl = Downloader:new()
+    dl.url = url
+    function dl.handler(dl, path, percent, err)
+        if path then
+            self:init(path)
+            oncomplete()
+        elseif percent then
+            if onprogress then
+                onprogress(percent)
+            end
+        elseif err then
+            oncomplete(err)
+        end
+    end
+    dl:start()
+    return self
+end
+
+function Deb:new(path)
     local self = super.new(self)
 
-    local control_dir = CACHE_DIR..'/control'
-
-    if path then
-        self.path = path
-        os.capture('setuid /bin/rm -rf '..control_dir)
-        local result = ''
-        local result, status = os.capture('setuid /usr/bin/dpkg-deb --control '..path..' '..control_dir)
-        if not(status == 0) then
-            C.alert_display('Failed getting deb info', result, 'Dismiss', nil, nil)
-        else
-            local f = io.open(control_dir..'/control', 'r')
-            for line in f:lines() do
-                local _, _, k, v = string.find(line, '(.*): (.*)')
-                if k and v then
-                    self[k] = v
-                end
-            end
-            f:close()
-        end
+    if path and not self:init(path) then
+        return nil
     end
 
     return self
 end
 
+local control_dir = '/var/tmp/dpkgappcontrol'
+function Deb:init(path)
+    local function cleanup()
+        os.capture('setuid /bin/rm -rf '..control_dir)
+    end
+    local function die(reason)
+        C.alert_display('Failed getting deb info', reason, 'Dismiss', nil, nil)
+        cleanup()
+    end
+
+    cleanup()
+    local result = ''
+    local result, status = os.capture('setuid /usr/bin/dpkg-deb --control '..path..' '..control_dir)
+    if not(status == 0) then
+        die(result)
+        return false
+    end
+    local f = io.open(control_dir..'/control', 'r')
+    if not f then
+        die('No control file')
+        return false
+    end
+    for line in f:lines() do
+        local _, _, k, v = string.find(line, '(.*): (.*)')
+        if k and v then
+            self[k] = v
+        end
+    end
+    f:close()
+
+    if not self.Package then
+        die('Malformed control file')
+        return false
+    end
+
+    local newpath = CACHE_DIR..'/'..self.Package..'.deb'
+    os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
+    os.capture('setuid /bin/mv '..path..' '..newpath)
+
+    self.path = newpath
+    cleanup()
+    return true
+end
+
 function Deb:uninstall(f)
-    C.pipeit('setuid /usr/bin/dpkg --remove '..self.Package, f)
+    C.pipeit('setuid /usr/bin/dpkg --remove '..self.Package, function(str, status)
+        if str == ffi.NULL and status == 0 then
+            self.installed = false
+        end
+        f(str, status)
+    end)
 end
 
 function Deb:install(f)
-    C.pipeit('setuid /usr/bin/dpkg -i '..self.path, f)
+    C.pipeit('setuid /usr/bin/dpkg -i '..self.path, function(str, status)
+        if str == ffi.NULL and status == 0 then
+            self.installed = true
+        end
+        f(str, status)
+    end)
 end
 
 function Deb.List()
@@ -54,6 +111,7 @@ function Deb.List()
             if k == 'Package' then
                 deblol()
                 deb = Deb:new()
+                deb.installed = true
             end
             deb[k] = v
         end

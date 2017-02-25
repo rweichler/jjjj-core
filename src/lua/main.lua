@@ -84,7 +84,7 @@ function table.cell:onselect(section, row)
         local depiction = Depiction:new()
         depiction.deb = item
         PUSHCONTROLLER(function(m)
-            depiction:load(m)
+            depiction:viewinstalled(m)
         end, depiction:gettitle())
     end
 end

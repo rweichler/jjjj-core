@@ -1,8 +1,22 @@
 local super = Object
 local Depiction = Object.new(super)
 
-function Depiction:new()
+function Depiction:new(arg1)
     local self = super.new(self)
+
+    if type(arg1) == 'table' then
+        self.deb = arg1
+    elseif type(arg1) == 'string' then
+        local url = arg1
+        self.deb = Deb:newfromurl(url, function(err)
+            self:ondownloadcomplete()
+        end, function(percent)
+            local dl = self.downloadbar
+            dl.progress:setProgress(percent)
+            dl.percent:setText(math.floor(percent*100 + 0.5)..'%')
+        end)
+    end
+
     return self
 end
 
@@ -22,7 +36,76 @@ function Depiction:getauthor()
     end
 end
 
-function Depiction:load(m)
+function Depiction:ondownloadcomplete()
+    local m = self.m
+    self.m = nil
+
+    self.downloadbar.m:removeFromSuperview()
+    self.downloadbar = nil
+
+    local namelabel = objc.UILabel:alloc():init()
+    namelabel:setFrame{{0, NAVHEIGHT()},{60,44}}
+    namelabel:setText(self.deb.Name or self.deb.Package)
+    namelabel:sizeToFit()
+    m:view():addSubview(namelabel)
+
+
+    local label = objc.UILabel:alloc():init()
+    label:setFont(objc.UIFont:fontWithName_size('Courier', 12))
+    label:setBackgroundColor(objc.UIColor:blackColor())
+    label:setTextColor(objc.UIColor:whiteColor())
+    label:setNumberOfLines(0)
+    label:setText('')
+    local function appendtext(s)
+        label:setText(objc.tolua(label:text())..s)
+        label:sizeToFit()
+        label:setFrame{{0, NAVHEIGHT() + namelabel:frame().size.height}, {m:view():frame().size.width, label:frame().size.height}}
+    end
+    appendtext('$ dpkg -i '..self.deb.Package..'.deb\n')
+
+    local target = ns.target:new()
+    local button = objc.UIBarButtonItem:alloc():initWithTitle_style_target_action('Install', UIBarButtonItemStylePlain, target.m, target.sel)
+    m:navigationItem():setRightBarButtonItem(button)
+    function target.onaction()
+        m:view():addSubview(label)
+        local oldtoggle = target.onaction
+        target.onaction = function() end
+        button:setTitle('Installing...')
+        local result = ''
+        self.deb:install(function(str, status)
+            if str == ffi.NULL then
+                if status == 0 then
+                    C.alert_display('Installed!', 'Woo!!', 'Dismiss', nil, nil)
+                    appendtext('Success! :D')
+                    m:navigationItem():setRightBarButtonItem(nil)
+                    --POPCONTROLLER()
+                    NAV[1] = Deb.List()
+                    THE_TABLE:updatefilter()
+                    THE_TABLE:refresh()
+                else
+                    C.alert_display('Failed', result, 'Dismiss', nil, nil)
+                    target.onaction = oldtoggle
+                    button:setTitle('Install')
+                end
+            else
+                local s = ffi.string(str)
+                appendtext(s)
+                result = result..s
+            end
+        end)
+    end
+end
+
+function Depiction:viewdownload(m)
+    m:view():setBackgroundColor(objc.UIColor:whiteColor())
+
+    self.downloadbar = Downloadbar:new()
+    m:view():addSubview(self.downloadbar.m)
+
+    self.m = m
+end
+
+function Depiction:viewinstalled(m)
     m:view():setBackgroundColor(objc.UIColor:whiteColor())
 
     local author = self:getauthor()
@@ -39,7 +122,8 @@ function Depiction:load(m)
     m:navigationItem():setRightBarButtonItem(button)
 
     function target.onaction()
-        C.alert_display('Uninstall', 'Do you really want to uninstall '..self.deb.Package..'?', 'Cancel', 'Uninstall', function()
+        button:setTitle('You sure?')
+        function target.onaction()
             local old = target.onaction
             target.onaction = function() end
             button:setTitle('Uninstalling...')
@@ -81,7 +165,7 @@ function Depiction:load(m)
                     result = result..s
                 end
             end)
-        end)
+        end
     end
 end
 
