@@ -38,19 +38,43 @@ _G.OPENURL = function(url)
                 os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
                 local path = CACHE_DIR..'/lastinstalled.deb'
                 os.capture('setuid /bin/mv '..url..' '..path)
+                local deb = Deb:new(path)
+                local namelabel = objc.UILabel:alloc():init()
+                namelabel:setFrame{{0, NAVHEIGHT()},{60,44}}
+                namelabel:setText(deb.Name or deb.Package)
+                namelabel:sizeToFit()
+                m:view():addSubview(namelabel)
+
+
+                local label = objc.UILabel:alloc():init()
+                label:setFont(objc.UIFont:fontWithName_size('Courier', 12))
+                label:setBackgroundColor(objc.UIColor:blackColor())
+                label:setTextColor(objc.UIColor:whiteColor())
+                label:setNumberOfLines(0)
+                label:setText('')
+                local function appendtext(s)
+                    label:setText(objc.tolua(label:text())..s)
+                    label:sizeToFit()
+                    label:setFrame{{0, NAVHEIGHT() + namelabel:frame().size.height}, {m:view():frame().size.width, label:frame().size.height}}
+                end
+                appendtext('$ dpkg -i '..deb.Package..'.deb\n')
+
                 local target = ns.target:new()
                 local button = objc.UIBarButtonItem:alloc():initWithTitle_style_target_action('Install', UIBarButtonItemStylePlain, target.m, target.sel)
                 m:navigationItem():setRightBarButtonItem(button)
                 function target.onaction()
+                    m:view():addSubview(label)
                     local oldtoggle = target.onaction
                     target.onaction = function() end
                     button:setTitle('Installing...')
                     local result = ''
-                    C.pipeit('setuid /usr/bin/dpkg -i '..path, function(str, status)
+                    deb:install(function(str, status)
                         if str == ffi.NULL then
                             if status == 0 then
                                 C.alert_display('Installed!', 'Woo!!', 'Dismiss', nil, nil)
-                                POPCONTROLLER()
+                                appendtext('Success! :D')
+                                m:navigationItem():setRightBarButtonItem(nil)
+                                --POPCONTROLLER()
                                 NAV[1] = Deb.List()
                                 THE_TABLE:updatefilter()
                                 THE_TABLE:refresh()
@@ -60,7 +84,9 @@ _G.OPENURL = function(url)
                                 button:setTitle('Install')
                             end
                         else
-                            result = result..ffi.string(str)
+                            local s = ffi.string(str)
+                            appendtext(s)
+                            result = result..s
                         end
                     end)
                 end
