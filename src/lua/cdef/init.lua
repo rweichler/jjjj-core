@@ -30,8 +30,34 @@ typedef void (*alert_input_callback_t)(const char *response);
 void alert_display(const char *title, const char *msg, const char *cancel, const char *ok, alert_callback_t callback);
 void alert_input(const char *title, const char *msg, const char *cancel, const char *ok, alert_input_callback_t callback);
 void pipeit(const char *cmd, void (*callback)(const char *, int));
+void animateit(float duration, float delay, int options, void (*animations)(), void (*completion)(bool));
 
 ]]
+
+UIViewAnimationOptionLayoutSubviews            = bit.lshift(1, 0)
+UIViewAnimationOptionAllowUserInteraction      = bit.lshift(1, 1)
+UIViewAnimationOptionBeginFromCurrentState     = bit.lshift(1, 2)
+UIViewAnimationOptionRepeat                    = bit.lshift(1, 3)
+UIViewAnimationOptionAutoreverse               = bit.lshift(1, 4)
+UIViewAnimationOptionOverrideInheritedDuration = bit.lshift(1, 5)
+UIViewAnimationOptionOverrideInheritedCurve    = bit.lshift(1, 6)
+UIViewAnimationOptionAllowAnimatedContent      = bit.lshift(1, 7)
+UIViewAnimationOptionShowHideTransitionViews   = bit.lshift(1, 8)
+UIViewAnimationOptionOverrideInheritedOptions  = bit.lshift(1, 9)
+
+UIViewAnimationOptionCurveEaseInOut            = bit.lshift(0, 16)
+UIViewAnimationOptionCurveEaseIn               = bit.lshift(1, 16)
+UIViewAnimationOptionCurveEaseOut              = bit.lshift(2, 16)
+UIViewAnimationOptionCurveLinear               = bit.lshift(3, 16)
+
+UIViewAnimationOptionTransitionNone            = bit.lshift(0, 20)
+UIViewAnimationOptionTransitionFlipFromLeft    = bit.lshift(1, 20)
+UIViewAnimationOptionTransitionFlipFromRight   = bit.lshift(2, 20)
+UIViewAnimationOptionTransitionCurlUp          = bit.lshift(3, 20)
+UIViewAnimationOptionTransitionCurlDown        = bit.lshift(4, 20)
+UIViewAnimationOptionTransitionCrossDissolve   = bit.lshift(5, 20)
+UIViewAnimationOptionTransitionFlipFromTop     = bit.lshift(6, 20)
+UIViewAnimationOptionTransitionFlipFromBottom  = bit.lshift(7, 20)
 
 NSTextAlignmentLeft      = 0    -- Visually left aligned
 NSTextAlignmentCenter    = 1    -- Visually centered

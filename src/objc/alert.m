@@ -107,3 +107,17 @@ void pipeit(const char *cmd, void (*callback)(const char *, int))
         });
     });
 }
+
+void animateit(float duration, float delay, int options, void (*animations)(), void (*completion)(bool))
+{
+    [UIView animateWithDuration:duration
+                          delay:delay
+                        options:options
+                     animations:^{
+                         animations();
+                     }
+                     completion:^(BOOL finished){
+                         completion(finished);
+                     }
+    ];
+}

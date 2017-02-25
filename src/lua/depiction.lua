@@ -76,7 +76,33 @@ function Depiction:view(m)
     label:setTextColor(objc.UIColor:whiteColor())
     label:setNumberOfLines(0)
     label:setText('')
+    label:setAlpha(0.7)
+    label:setUserInteractionEnabled(false)
     local function appendtext(s)
+        if s == true then
+            local label2 = objc.UILabel:alloc():init()
+            label2:setFont(label:font())
+            label2:setAlpha(0.7)
+            label2:setUserInteractionEnabled(false)
+            label2:setBackgroundColor(label:backgroundColor())
+            label2:setTextColor(objc.UIColor:greenColor())
+            label2:setText('Success! :D')
+            label2:sizeToFit()
+            label2:setFrame{{0, NAVHEIGHT() + label:frame().size.height},{m:view():frame().size.width, label2:frame().size.height}}
+            m:view():addSubview(label2)
+            ANIMATE(1, 1, function(finished)
+                if finished == nil then
+                    label:setAlpha(0)
+                    label2:setAlpha(0)
+                elseif finished then
+                    label2:removeFromSuperview()
+                    label:setAlpha(0.7)
+                    label:setText('')
+                    label:sizeToFit()
+                end
+            end)
+            return
+        end
         label:setText(objc.tolua(label:text())..s)
         label:sizeToFit()
         label:setFrame{{0, NAVHEIGHT()}, {m:view():frame().size.width, label:frame().size.height}}
@@ -108,11 +134,10 @@ function Depiction:addbutton(m, appendtext)
                         if status == 0 then
                             m:navigationItem():setRightBarButtonItem(nil)
                             --POPCONTROLLER()
-                            appendtext('Success! :D')
+                            appendtext(true)
                             NAV[1] = Deb.List()
                             THE_TABLE:updatefilter()
                             THE_TABLE:refresh()
-                            C.alert_display('Uninstalled '..self.deb.Package, 'Woooooo!', 'Dismiss', nil, nil)
                             self:addbutton(m, appendtext)
                         else
                             C.alert_display('Failed to uninstall '..self.deb.Package, result, 'Dismiss', nil, nil)
@@ -141,8 +166,7 @@ function Depiction:addbutton(m, appendtext)
             self.deb:install(function(str, status)
                 if str == ffi.NULL then
                     if status == 0 then
-                        C.alert_display('Installed!', 'Woo!!', 'Dismiss', nil, nil)
-                        appendtext('Success! :D')
+                        appendtext(true)
                         m:navigationItem():setRightBarButtonItem(nil)
                         --POPCONTROLLER()
                         NAV[1] = Deb.List()
