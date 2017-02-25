@@ -1,8 +1,12 @@
 local super = Object
 local Deb = Object.new(super)
 
-function Deb:new(...)
-    local self = super.new(self, ...)
+function Deb:new(path)
+    local self = super.new(self)
+
+    if path then
+    end
+
     return self
 end
 

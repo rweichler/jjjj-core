@@ -133,6 +133,9 @@ local vc = VIEWCONTROLLER(function(m)
 end, 'Installed')
 
 _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(vc)
+_G.NAVHEIGHT = function()
+    return 64
+end
 window:setRootViewController(NAVCONTROLLER:retain())
 window:makeKeyAndVisible()
 

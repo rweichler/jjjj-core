@@ -28,7 +28,7 @@ function Depiction:load(m)
     local author = self:getauthor()
     if author then
         local label = objc.UILabel:alloc():init()
-        label:setFrame{{20, 80},{60,44}}
+        label:setFrame{{20, NAVHEIGHT()},{60,44}}
         label:setText('by '..self:getauthor())
         label:sizeToFit()
         m:view():addSubview(label)
@@ -44,10 +44,28 @@ function Depiction:load(m)
             target.onaction = function() end
             button:setTitle('Uninstalling...')
             local result = ''
+
+            local label = objc.UILabel:alloc():init()
+            label:setFont(objc.UIFont:fontWithName_size('Courier', 12))
+            label:setBackgroundColor(objc.UIColor:blackColor())
+            label:setTextColor(objc.UIColor:whiteColor())
+            label:setNumberOfLines(0)
+            label:setText('')
+            local function appendtext(s)
+                label:setText(objc.tolua(label:text())..s)
+                label:sizeToFit()
+                label:setFrame{{0, NAVHEIGHT()}, {m:view():frame().size.width, label:frame().size.height}}
+            end
+            appendtext('$ dpkg --remove '..self.deb.Package..'\n')
+            m:view():addSubview(label)
+
+
             self.deb:uninstall(function(line, status)
                 if line == ffi.NULL then
                     if status == 0 then
-                        POPCONTROLLER()
+                        m:navigationItem():setRightBarButtonItem(nil)
+                        --POPCONTROLLER()
+                        appendtext('Success! :D')
                         NAV[1] = Deb.List()
                         THE_TABLE:updatefilter()
                         THE_TABLE:refresh()
@@ -58,7 +76,9 @@ function Depiction:load(m)
                         button:setTitle('Uninstall')
                     end
                 else
-                    result = result..ffi.string(line)
+                    local s = ffi.string(line)
+                    appendtext(s)
+                    result = result..s
                 end
             end)
         end)
