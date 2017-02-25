@@ -3,15 +3,6 @@ if jit.arch == 'arm64' then
     jit.off()
 end
 
-local olderror = error
-function error(...)
-    local a, b, c, d, e, f, g, h, j, i = ...
-    local success, err = xpcall(function()
-        olderror(a, b, c, d, e, f, g, h, i)
-    end, debug.traceback)
-    olderror(string.gsub(err, '\n', '\ndeepkg   '))
-end
-
 local argc, argv = ...
 package.path = PATH..'/?.lua;'..
                PATH..'/?/init.lua;'..

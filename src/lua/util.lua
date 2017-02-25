@@ -1,8 +1,17 @@
 ffi.cdef[[
 void dpkg_syslog(const char *);
 ]]
-function print(str)
-    C.dpkg_syslog(tostring(str))
+function print(str, ...)
+    if ... then
+        local args = {str, ...}
+        local t = {}
+        for i=1,#args do
+            t[i] = tostring(args[i])
+        end
+        C.dpkg_syslog(table.concat(t, ', '))
+    else
+        C.dpkg_syslog(tostring(str))
+    end
 end
 
 ffi.cdef[[
