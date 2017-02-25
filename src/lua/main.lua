@@ -175,4 +175,9 @@ _G.ANIMATE = function(arg1, arg2, arg3, arg4, arg5)
     end
     C.animateit(duration, delay, options, animations, completion)
 end
-require 'openurl'
+_G.OPENURL = function(url)
+    PUSHCONTROLLER(function(m)
+        local depiction = Depiction:new(url)
+        depiction:viewdownload(m)
+    end, 'Install deb')
+end
