@@ -101,18 +101,26 @@ function Deb:install(f)
     end)
 end
 
-function Deb.List()
+function Deb.List(path)
     local t = {}
-
     local deb
-    local function deblol()
-        local ok = 'ok installed'
-        if deb and string.sub(deb.Status, #deb.Status - #ok + 1, #deb.Status) == ok then
+    local deblol
+    if not path then
+        deblol = function()
+            local ok = 'ok installed'
+            if deb and string.sub(deb.Status, #deb.Status - #ok + 1, #deb.Status) == ok then
+                t[#t + 1] = deb
+            end
+        end
+    else
+        deblol = function()
             t[#t + 1] = deb
         end
     end
 
-    local f = io.open('/var/lib/dpkg/status', 'r')
+    path = path or '/var/lib/dpkg/status'
+
+    local f = io.open(path, 'r')
     for line in f:lines() do
         local _, _, k, v = string.find(line, '(.*): (.*)')
         if k and v then

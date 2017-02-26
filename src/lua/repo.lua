@@ -4,13 +4,14 @@ local Repo = Object.new(super)
 function Repo:new(url)
     local self = super.new(self)
     self.url = url
+    self.prettyurl = string.gsub(string.gsub(self.url, 'http://', ''), 'https://', '')
+    self.prettyurl = string.sub(self.prettyurl, 1, #self.prettyurl - 1)
     return self
 end
 
 function Repo:getrelease(callback)
     local dl = ns.http:new()
     dl.url = self.url..'Release'
-    print(dl.url)
     function dl.handler(dl, data, percent, errcode)
         if errcode then
         elseif data then
@@ -21,6 +22,25 @@ function Repo:getrelease(callback)
                     self[k] = v
                 end
             end
+            callback()
+        end
+    end
+    dl:start()
+end
+
+function Repo:getpackages(callback)
+    local dl = ns.http:new()
+    dl.url = self.url..'Packages.bz2'
+    dl.download = true
+    function dl.handler(dl, path, percent, errcode)
+        if errcode then
+        elseif path then
+            local home = CACHE_DIR..'/repos'
+            os.capture('setuid /bin/mkdir -p '..home)
+            self.path = home..'/'..self.prettyurl
+            os.capture('setuid /bin/mv '..path..' '..self.path..'.bz2')
+            os.capture('setuid /bin/bunzip2 '..self.path..'.bz2')
+            self.debs = Deb.List(self.path)
             callback()
         end
     end
