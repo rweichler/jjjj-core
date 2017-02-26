@@ -8,8 +8,13 @@ function Depiction:new(arg1)
         self.deb = arg1
     elseif type(arg1) == 'string' then
         local url = arg1
-        self.deb = Deb:newfromurl(url, function(err)
-            self:ondownloadcomplete()
+        self.deb = Deb:newfromurl(url, function(errcode)
+            if errcode then
+                C.alert_display('Could not download deb', 'Got '..errcode.. ' HTTP error', 'Dismiss', nil, nil)
+                POPCONTROLLER()
+            else
+                self:ondownloadcomplete()
+            end
         end, function(percent)
             local dl = self.downloadbar
             dl.progress:setProgress(percent)

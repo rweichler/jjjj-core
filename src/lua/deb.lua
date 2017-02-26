@@ -6,16 +6,16 @@ function Deb:newfromurl(url, oncomplete, onprogress)
     local dl = ns.http:new()
     dl.download = true
     dl.url = url
-    function dl.handler(dl, path, percent, err)
-        if path then
+    function dl.handler(dl, path, percent, errcode)
+        if errcode then
+            oncomplete(errcode)
+        elseif path then
             self:init(path)
             oncomplete()
         elseif percent then
             if onprogress then
                 onprogress(percent)
             end
-        elseif err then
-            oncomplete(err)
         end
     end
     dl:start()
