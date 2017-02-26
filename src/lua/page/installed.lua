@@ -99,7 +99,7 @@ function tbl.searchbar:ontextchange(text)
 end
 
 HOOK(Deb, 'UpdateList', function(orig, ...)
-    deblist = Deb.List
+    deblist = Deb.List()
     tbl:updatefilter()
     tbl:refresh()
     return orig(...)

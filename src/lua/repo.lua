@@ -63,6 +63,7 @@ function Repo:getpackages(callback, ext)
             if status == 0 then
                 self.debs = Deb.List(self.path)
                 for k, deb in ipairs(self.debs) do
+                    deb.repo = self
                     --print(deb.Package)
                 end
             else

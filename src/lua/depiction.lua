@@ -8,21 +8,26 @@ function Depiction:new(arg1)
         self.deb = arg1
     elseif type(arg1) == 'string' then
         local url = arg1
-        self.deb = Deb:newfromurl(url, function(errcode)
-            if errcode then
-                C.alert_display('Could not download deb', 'Got '..errcode.. ' HTTP error', 'Dismiss', nil, nil)
-                POPCONTROLLER()
-            else
-                self:ondownloadcomplete()
-            end
-        end, function(percent)
-            local dl = self.downloadbar
-            dl.progress:setProgress(percent)
-            dl.percent:setText(math.floor(percent*100 + 0.5)..'%')
-        end)
+        self:startdownload(url)
     end
 
     return self
+end
+
+function Depiction:startdownload(url)
+    print('Downloading from '..url)
+    self.deb = Deb:newfromurl(url, function(errcode)
+        if errcode then
+            C.alert_display('Could not download deb', 'Got '..errcode.. ' HTTP error', 'Dismiss', nil, nil)
+            POPCONTROLLER()
+        else
+            self:ondownloadcomplete()
+        end
+    end, function(percent)
+        local dl = self.downloadbar
+        dl.progress:setProgress(percent)
+        dl.percent:setText(math.floor(percent*100 + 0.5)..'%')
+    end)
 end
 
 function Depiction:gettitle()
@@ -186,6 +191,20 @@ function Depiction:addbutton(m, appendtext)
                     result = result..s
                 end
             end)
+        end
+    elseif self.deb.Filename and self.deb.repo then
+        local target = ns.target:new()
+        local button = objc.UIBarButtonItem:alloc():initWithTitle_style_target_action('Download', UIBarButtonItemStylePlain, target.m, target.sel)
+        m:navigationItem():setRightBarButtonItem(button)
+        function target.onaction()
+            if not(string.sub(self.deb.Filename, 1, 2) == './') then
+                C.alert_display('NOPE', 'NOPE', 'Dismiss', nil, nil)
+                return
+            end
+            local url = self.deb.repo.url..string.sub(self.deb.Filename, 3, #self.deb.Filename)
+            m:navigationItem():setRightBarButtonItem(nil)
+            self:viewdownload(m)
+            self:startdownload(url)
         end
     end
 end
