@@ -31,6 +31,7 @@ end
 local map = {}
 map['.bz2'] = '/bin/bunzip2'
 map['.gz'] = '/bin/gzip -d'
+map['Index'] = 'bin/touch'
 
 function Repo:getpackages(callback, ext)
     ext = ext or '.bz2'
@@ -42,6 +43,8 @@ function Repo:getpackages(callback, ext)
             if errcode == 404 then
                 if ext == '.bz2' then
                     self:getpackages(callback, '.gz')
+                elseif ext == '.gz' then
+                    self:getpackages(callback, 'Index')
                 end
             end
         elseif path then
@@ -49,10 +52,16 @@ function Repo:getpackages(callback, ext)
             os.capture('setuid /bin/mkdir -p '..home)
             self.path = home..'/'..string.gsub(self.prettyurl, '/', '-')
             os.capture('setuid /bin/mv '..path..' '..self.path..ext)
-            os.capture('setuid '..map[ext]..' '..self.path..ext)
-            self.debs = Deb.List(self.path)
-            for k, deb in ipairs(self.debs) do
-                print(deb.Package)
+            os.capture('setuid /bin/rm -f '..self.path)
+            local result, status = os.capture('setuid '..map[ext]..' '..self.path..ext)
+            os.capture('setuid /bin/rm -f '..self.path..ext)
+            if status == 0 then
+                self.debs = Deb.List(self.path)
+                for k, deb in ipairs(self.debs) do
+                    print(deb.Package)
+                end
+            else
+                print('ERROR: '..result)
             end
             callback()
         end
@@ -76,13 +85,13 @@ end
 local function populate(repolist)
     local t = {}
     for line in (repolist.."\n"):gmatch"(.-)\n" do
-        repeat
+        repeat -- remove comments
             local match = string.match(line, '(.*)#.*')
             line = match or line
         until not match
 
-        if not(line == '') then
-            local url = string.match(line, 'deb%s+(.*/)%s+%.%/')
+        local url = string.match(line, 'deb%s+(.*/)%s+%.%/')
+        if url then
             t[#t + 1] = Repo:new(url)
         end
     end
@@ -96,10 +105,8 @@ function Repo.List(url, oncomplete)
         if data then
             local str = objc.NSString:alloc():initWithData_encoding(data, NSUTF8StringEncoding)
             oncomplete(populate(objc.tolua(str)))
-        else
-            print(data)
-            print(percent)
-            print(errcode)
+        elseif errcode then
+            dl:start()
         end
     end
     dl:start()

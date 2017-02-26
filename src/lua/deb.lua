@@ -122,21 +122,30 @@ function Deb.List(path)
         end
     end
 
+    local map = {}
+
     local deb
     for line in f:lines() do
-        print('///////////// '..line)
         local k,v = Deb.ParseLine(line)
         if k and v then
             if not deb then
-                print('deb = Deb:new()')
                 deb = Deb:new()
             end
-            print('deb[k] = v')
             deb[k] = v
         elseif deb then
-            print('t[#t + 1] = filter(deb); deb = nil')
             if deb.Package then
-                t[#t + 1] = filter(deb)
+                local deb = filter(deb)
+                if deb then
+                    local existing = map[deb.Package]
+                    existing = existing and t[existing]
+                    if existing then
+                        existing.downgrades = existing.downgrades or {}
+                        table.insert(existing.downgrades, filter(deb))
+                    else
+                        t[#t + 1] = deb
+                        map[deb.Package] = #t
+                    end
+                end
             end
             deb = nil
         end
