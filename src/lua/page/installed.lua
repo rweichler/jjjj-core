@@ -26,7 +26,6 @@ local function strfind(s, text)
     return string.find(string.lower(s), string.lower(text))
 end
 
-
 local tbl = ui.table:new()
 tbl.items = {}
 function tbl:onscroll(x, y)
@@ -67,9 +66,7 @@ function tbl.cell:onselect(section, row)
         depiction:view(m)
     end, depiction:gettitle())
 end
-function tbl.cell:mnew()
-    return objc.UITableViewCell:alloc():initWithStyle_reuseIdentifier(3, self.identifier)
-end
+
 function tbl.cell:onshow(m, section, row)
     local deb = tbl.items[section][row]
     if not deb then return end
@@ -110,13 +107,17 @@ end)
 
 
 _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
-    local size = m:view():frame().size
-    tbl.m:setFrame{{0, 0}, {size.width, size.height}}
+    tbl.m:setFrame(m:view():bounds())
     m:view():addSubview(tbl.m)
 end, 'Installed'))
 
 _G.NAVHEIGHT = function()
     return 64
+end
+
+_G.BARHEIGHT = function()
+    -- TODO return 56 on iOS 7
+    return 49
 end
 
 

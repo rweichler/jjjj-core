@@ -14,8 +14,9 @@ function ui.cell:onselect(section, row)
 end
 function ui.cell:onshow(m, section, row)
 end
+
 function ui.cell:mnew()
-    error('not implemented')
+    return objc.UITableViewCell:alloc():initWithStyle_reuseIdentifier(3, self.identifier)
 end
 
 ui.cell.class = objc.GenerateClass('UITableViewCell')

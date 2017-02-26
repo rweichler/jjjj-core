@@ -69,18 +69,12 @@ end
 function Depiction:view(m)
     m:view():setBackgroundColor(objc.UIColor:whiteColor())
 
-    local url = 'http://cydia.saurik.com/package/'..self.deb.Package
+    local url = self.deb.Depiction or 'http://cydia.saurik.com/package/'..self.deb.Package
     local webview = objc.UIWebView:alloc():initWithFrame(m:view():bounds())
     local request = objc.NSURLRequest:requestWithURL(objc.NSURL:URLWithString(url))
     webview:loadRequest(request)
 
     m:view():addSubview(webview)
-
-    local label = objc.UILabel:alloc():init()
-    label:setFrame{{0, NAVHEIGHT()},{60,44}}
-    label:setText(self.deb.Name or self.deb.Package)
-    label:sizeToFit()
-    m:view():addSubview(label)
 
     local label = objc.UILabel:alloc():init()
     label:setFont(objc.UIFont:fontWithName_size('Courier', 12))
