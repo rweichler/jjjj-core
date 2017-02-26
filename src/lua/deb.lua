@@ -105,10 +105,11 @@ function Deb.List(path)
     local t = {}
     local f = io.open(path or '/var/lib/dpkg/status', 'r')
     if not f then
-        t[1] = {}
-        t[1].Name = 'Error'
-        t[1].Section = 'Development'
-        t[1].Package = 'error'
+        t[1] = {
+            Name = 'Error',
+            Package = 'error',
+            Description = 'File "'..path..'" not found',
+        }
         return t
     end
 
@@ -116,6 +117,7 @@ function Deb.List(path)
         local x = deb.Status
         local y = 'ok installed'
         if x and string.sub(x, #x - #y + 1, #x) == y then
+            deb.installed = true
             return deb
         end
     end
