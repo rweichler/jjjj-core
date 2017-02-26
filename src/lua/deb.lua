@@ -133,7 +133,9 @@ function Deb.List(path)
             deb[k] = v
         elseif deb then
             print('t[#t + 1] = filter(deb); deb = nil')
-            t[#t + 1] = filter(deb)
+            if deb.Package then
+                t[#t + 1] = filter(deb)
+            end
             deb = nil
         end
     end

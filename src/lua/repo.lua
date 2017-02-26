@@ -28,18 +28,28 @@ function Repo:getrelease(callback)
     dl:start()
 end
 
-function Repo:getpackages(callback)
+local map = {}
+map['.bz2'] = '/bin/bunzip2'
+map['.gz'] = '/bin/gzip -d'
+
+function Repo:getpackages(callback, ext)
+    ext = ext or '.bz2'
     local dl = ns.http:new()
-    dl.url = self.url..'Packages.bz2'
+    dl.url = self.url..'Packages'..ext
     dl.download = true
     function dl.handler(dl, path, percent, errcode)
         if errcode then
+            if errcode == 404 then
+                if ext == '.bz2' then
+                    self:getpackages(callback, '.gz')
+                end
+            end
         elseif path then
             local home = CACHE_DIR..'/repos'
             os.capture('setuid /bin/mkdir -p '..home)
             self.path = home..'/'..string.gsub(self.prettyurl, '/', '-')
-            os.capture('setuid /bin/mv '..path..' '..self.path..'.bz2')
-            os.capture('setuid /bin/bunzip2 '..self.path..'.bz2')
+            os.capture('setuid /bin/mv '..path..' '..self.path..ext)
+            os.capture('setuid '..map[ext]..' '..self.path..ext)
             self.debs = Deb.List(self.path)
             for k, deb in ipairs(self.debs) do
                 print(deb.Package)
