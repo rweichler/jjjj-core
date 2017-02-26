@@ -1,5 +1,4 @@
 local super = Object
-            end
 local Depiction = Object.new(super)
 
 function Depiction:new(arg1)
