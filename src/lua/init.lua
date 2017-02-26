@@ -17,6 +17,16 @@ objc = require 'objc'
 require 'util'
 require 'cdef'
 
+function HOOK(t, k, hook)
+    local orig = t[k]
+    if not(type(orig) == 'function') then
+        error('invalid type')
+    end
+    t[k] = function(...)
+        return hook(orig, ...)
+    end
+end
+
 local count = 0
 function objc.GenerateClass(super, ...)
     super = super or 'NSObject'

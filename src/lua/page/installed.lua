@@ -1,23 +1,21 @@
-local nav = {}
-_G.NAV = nav
-local lastfiltered
-local filtered
+local deblist = Deb.List()
+local lastfiltered, filtered
 local function list()
     if filtered then
-        if lastfiltered == nav[#nav] then
+        if lastfiltered == deblist then
             return filtered
         else
             filtered = nil
         end
     end
     lastfiltered = nil
-    return nav[#nav]
+    return deblist
 end
 
 local function filter(t)
     filtered = t
     if filtered then
-        lastfiltered = nav[#nav]
+        lastfiltered = deblist
     else
         lastfiltered = nil
     end
@@ -28,8 +26,6 @@ local function strfind(s, text)
     return string.find(string.lower(s), string.lower(text))
 end
 
-
-nav[#nav + 1] = Deb.List()
 
 local tbl = ui.table:new()
 tbl.items = {}
@@ -48,7 +44,7 @@ function tbl:updatefilter(text)
         filter(nil)
     else
         local t = {}
-        for k,v in pairs(nav[#nav]) do
+        for k,v in pairs(deblist) do
             if strfind(v.Name, text) or strfind(v.Package, text) then
                 t[#t + 1] = v
             end
@@ -65,19 +61,11 @@ function tbl.cell:onselect(section, row)
     if self.searchbar then
         tbl.searchbar.m:resignFirstResponder()
     end
-    local item = tbl.items[section][row]
-    if item and item.select then
-        if item:select(nav) then
-            tbl:updatefilter()
-            tbl:refresh()
-        end
-    else
-        local depiction = Depiction:new()
-        depiction.deb = item
-        PUSHCONTROLLER(function(m)
-            depiction:view(m)
-        end, depiction:gettitle())
-    end
+    local depiction = Depiction:new()
+    depiction.deb = tbl.items[section][row]
+    PUSHCONTROLLER(function(m)
+        depiction:view(m)
+    end, depiction:gettitle())
 end
 function tbl.cell:mnew()
     return objc.UITableViewCell:alloc():initWithStyle_reuseIdentifier(3, self.identifier)
@@ -113,16 +101,20 @@ function tbl.searchbar:ontextchange(text)
     tbl:refresh()
 end
 
-_G.THE_TABLE = tbl
+HOOK(Deb, 'UpdateList', function(orig, ...)
+    deblist = Deb.List
+    tbl:updatefilter()
+    tbl:refresh()
+    return orig(...)
+end)
 
 
-local vc = VIEWCONTROLLER(function(m)
+_G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
     local size = m:view():frame().size
     tbl.m:setFrame{{0, 0}, {size.width, size.height}}
     m:view():addSubview(tbl.m)
-end, 'Installed')
+end, 'Installed'))
 
-_G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(vc)
 _G.NAVHEIGHT = function()
     return 64
 end
