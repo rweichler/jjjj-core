@@ -8,11 +8,6 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
     local tbl = ui.table:new()
     tbl.items = {{'Loading...'}}
     tbl.cell = ui.cell:new()
-    tbl.cell.identifier = objc.toobj('sdfadsfdd')
-    function tbl.cell.onshow(cell, m, section, row)
-        local str = tbl.items[section][row]
-        m:textLabel():setText(str)
-    end
     tbl:refresh()
     tbl.m:setFrame(m:view():bounds())
     m:view():addSubview(tbl.m)
@@ -28,7 +23,6 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
         end
         tbl.items = {repos}
         tbl.cell = ui.cell:new()
-        tbl.cell.identifier = objc.toobj('sdfoijasd')
         function tbl.cell.onshow(cell, m, section, row)
             local repo = tbl.items[section][row]
             m:textLabel():setText(repo.Origin or repo.Title or repo.prettyurl)
@@ -40,15 +34,31 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
             local tbl = ui.table:new()
             tbl.items = {{'Loading...'}}
             tbl.cell = ui.cell:new()
-            tbl.cell.identifier = objc.toobj('aosidjfoaisjfdaiosdjfa')
-            function tbl.cell.onshow(cell, m, section, row)
-                local str = tbl.items[section][row]
-                m:textLabel():setText(str)
-            end
             tbl:refresh()
 
             repo:getpackages(function()
-                tbl.items = {{}}
+                tbl.items = {repo.debs}
+                tbl.cell = ui.cell:new()
+                function tbl.cell.onshow(cell, m, section, row)
+                    local deb = tbl.items[section][row]
+                    m:textLabel():setText(deb.Name or deb.Package)
+                    m:detailTextLabel():setText(deb.Description)
+
+                    local img = nil
+                    if deb.Section then
+                        local path = '/Applications/Cydia.app/Sections/'..string.gsub(deb.Section, ' ', '_')..'.png'
+                        local f = io.open(path, 'r')
+                        if f then
+                            f:close()
+                        else
+                            img = repo.icon
+                            path = '/Applications/Cydia.app/unknown.png'
+                        end
+                        img = img or objc.UIImage:imageWithContentsOfFile(path)
+                    end
+
+                    m:imageView():setImage(img)
+                end
                 tbl:refresh()
             end)
 

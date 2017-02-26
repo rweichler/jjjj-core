@@ -7,6 +7,7 @@ function ui.table:new()
     objc.Lua(self.m, self)
     self.m:setDelegate(self.m)
     self.m:setDataSource(self.m)
+    self.items = {{}}
     return self
 end
 
@@ -23,7 +24,12 @@ function ui.table:refresh()
 end
 
 function ui.table:getcell(section, row)
-    return self.cell or self.items[section][row]
+    if self.cell then
+        self.cell.table = self
+        return self.cell
+    else
+        error('wat??')
+    end
 end
 
 function ui.table:onscroll(x, y)

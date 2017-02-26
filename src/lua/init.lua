@@ -42,7 +42,7 @@ function objc.GenerateClass(super, ...)
     return objc[name]
 end
 local objc_objz = {}
-function objc.Lua(obj, set)
+function objc.AssocLua(obj, set)
     local hash = tonumber(ffi.cast('uintptr_t',obj))
     local result = objc_objz[hash]
     if set then
@@ -52,6 +52,11 @@ function objc.Lua(obj, set)
     end
     return result
 end
+
+function objc.Lua(...)
+    return objc.AssocLua(...)
+end
+
 
 function VIEWCONTROLLER(callback, title)
     local m = objc.GenerateClass('UIViewController'):alloc():init()

@@ -121,6 +121,15 @@ function Deb.List(path)
     path = path or '/var/lib/dpkg/status'
 
     local f = io.open(path, 'r')
+
+    if not f then
+        t[1] = {}
+        t[1].Name = 'Error'
+        t[1].Section = 'Development'
+        t[1].Package = 'error'
+        return t
+    end
+
     for line in f:lines() do
         local _, _, k, v = string.find(line, '(.*): (.*)')
         if k and v then
