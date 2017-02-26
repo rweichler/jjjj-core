@@ -34,6 +34,13 @@ void animateit(float duration, float delay, int options, void (*animations)(), v
 
 ]]
 
+NSUTF8StringEncoding = 4
+
+NSURLSessionTaskStateRunning   = 0
+NSURLSessionTaskStateSuspended = 1
+NSURLSessionTaskStateCanceling = 2
+NSURLSessionTaskStateCompleted = 3
+
 UIViewAnimationOptionLayoutSubviews            = bit.lshift(1, 0)
 UIViewAnimationOptionAllowUserInteraction      = bit.lshift(1, 1)
 UIViewAnimationOptionBeginFromCurrentState     = bit.lshift(1, 2)

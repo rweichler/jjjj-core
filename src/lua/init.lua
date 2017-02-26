@@ -67,6 +67,7 @@ end
 Object = require 'object'
 Deb = require 'deb'
 Depiction = require 'depiction'
+Repo = require 'repo'
 
 ui = {}
 require 'ui.table'

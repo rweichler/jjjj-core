@@ -51,12 +51,24 @@ end
 function ns.http:handler()
     --[[
     ARGS
-    file download: url, status, err
+    file download: url, percent, errcode
+    data: data, percent, errcode
     ]]
 end
 
 ns.http.class = objc.GenerateClass()
 local class = ns.http.class
+
+-- data request
+
+objc.addmethod(class, 'URLSession:dataTask:didReceiveData:', function(self, session, task, data)
+    local this = objc.Lua(self)
+
+    if not this.mdata then
+        this.mdata = objc.NSMutableData:alloc():init()
+    end
+    this.mdata:appendData(data)
+end, ffi.arch == 'arm64' and 'v40@0:8@16@24@32' or 'v20@0:4@8@12@16')
 
 -- download request
 
@@ -72,7 +84,7 @@ objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', func
         url = string.sub(url, #'file://' + 1, #url)
         this:handler(url)
     else
-        this:handler(nil, nil, status)
+        this:handler(url, nil, status)
     end
 end, ffi.arch == 'arm64' and 'v40@0:8@16@24@32' or 'v20@0:4@8@12@16')
 
@@ -92,6 +104,16 @@ objc.addmethod(class, 'URLSession:task:didCompleteWithError:', function(self, se
     if err and not(err == ffi.NULL) then
         local desc = err.description
         this:handler(nil, nil, objc.tolua(desc))
+    elseif not this.download and this.mdata then
+        local response = task:response()
+        local status = tonumber(response:statusCode())
+        if status >= 200 and status < 300 then
+            local data = this.mdata
+            this.mdata = nil
+            this:handler(data)
+        else
+            this:handler(nil, nil, status)
+        end
     end
 end, ffi.arch == 'arm64' and 'v32@0:8@16@24' or 'v16@0:4@8@12')
 
