@@ -53,8 +53,13 @@ function Repo:getpackages(callback, ext)
             self.path = home..'/'..string.gsub(self.prettyurl, '/', '-')
             os.capture('setuid /bin/mv '..path..' '..self.path..ext)
             os.capture('setuid /bin/rm -f '..self.path)
-            local result, status = os.capture('setuid '..map[ext]..' '..self.path..ext)
-            os.capture('setuid /bin/rm -f '..self.path..ext)
+            local result, status
+            if map[ext] then
+                result, status = os.capture('setuid '..map[ext]..' '..self.path..ext)
+                os.capture('setuid /bin/rm -f '..self.path..ext)
+            else
+                result, status = os.capture('setuid /bin/mv '..self.path..ext..' '..self.path)
+            end
             if status == 0 then
                 self.debs = Deb.List(self.path)
                 for k, deb in ipairs(self.debs) do
