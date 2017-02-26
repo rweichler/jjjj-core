@@ -32,6 +32,13 @@ function Deb:new(path)
     return self
 end
 
+function Deb.ParseLine(line)
+    local _, _, k, v = string.find(line, '(.*):%s*(.*)')
+    if k and v then
+        return k, v
+    end
+end
+
 local control_dir = '/var/tmp/dpkgappcontrol'
 function Deb:init(path)
     local function cleanup()
@@ -55,7 +62,7 @@ function Deb:init(path)
         return false
     end
     for line in f:lines() do
-        local _, _, k, v = string.find(line, '(.*): (.*)')
+        local k, v = Deb.ParseLine(line)
         if k and v then
             self[k] = v
         end

@@ -33,6 +33,14 @@ void pipeit(const char *cmd, void (*callback)(const char *, int));
 void animateit(float duration, float delay, int options, void (*animations)(), void (*completion)(bool));
 
 ]]
+UITableViewRowAnimationFade     = 0
+UITableViewRowAnimationRight    = 1
+UITableViewRowAnimationLeft     = 2
+UITableViewRowAnimationTop      = 3
+UITableViewRowAnimationBottom   = 4
+UITableViewRowAnimationNone     = 5
+UITableViewRowAnimationMiddle   = 6
+UITableViewRowAnimationAutomatic = 100
 
 NSUTF8StringEncoding = 4
 

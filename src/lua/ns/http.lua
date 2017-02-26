@@ -39,11 +39,7 @@ function ns.http:parseheaders(headers)
             local offset = os.time()-os.time(os.date("!*t"))
             local epoch = os.time({day=day,month=month,year=year,hour=hour,min=min,sec=sec})+offset
             headers['Last-Modified'] = epoch
-            print(epoch)
         end
-    end
-    for k,v in pairs(headers) do
-        print(k..': '..v)
     end
     self.headers = headers
 end
@@ -84,7 +80,7 @@ objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', func
         url = string.sub(url, #'file://' + 1, #url)
         this:handler(url)
     else
-        this:handler(url, nil, status)
+        this:handler(objc.tolua(url), nil, status)
     end
 end, ffi.arch == 'arm64' and 'v40@0:8@16@24@32' or 'v20@0:4@8@12@16')
 
