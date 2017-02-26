@@ -59,6 +59,13 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
 
                     m:imageView():setImage(img)
                 end
+                function tbl.cell.onselect(cell, section, row)
+                    local depiction = Depiction:new()
+                    depiction.deb = tbl.items[section][row]
+                    PUSHCONTROLLER(function(m)
+                        depiction:view(m)
+                    end, depiction:gettitle())
+                end
                 tbl:refresh()
             end)
 

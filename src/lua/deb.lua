@@ -33,8 +33,11 @@ function Deb:new(path)
 end
 
 function Deb.ParseLine(line)
-    local _, _, k, v = string.find(line, '(.*):%s*(.*)')
-    if k and v then
+    local colon = string.find(line, ':')
+    if colon then
+        local k = string.sub(line, 1, colon - 1)
+        local v = string.sub(line, colon + 1, #line)
+        v = string.match(v, '%s*(.*)')
         return k, v
     end
 end
