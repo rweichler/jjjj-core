@@ -136,16 +136,16 @@ REPOCONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
 local path = '/Applications/Cydia.app/manage7@2x.png'
 NAVCONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
 
-_G.ACECONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
-end, 'ace'))
+_G.BROWSECONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
+end, 'Browse'))
 local path = RES_PATH..'/globe.png'
-ACECONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
+BROWSECONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
 
 _G.TABBARCONTROLLER = objc.UITabBarController:alloc():init()
 TABBARCONTROLLER:setViewControllers{
     REPOCONTROLLER,
     NAVCONTROLLER,
-    ACECONTROLLER,
+    BROWSECONTROLLER,
 }
 window:setRootViewController(TABBARCONTROLLER)
 window:makeKeyAndVisible()
