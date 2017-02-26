@@ -56,7 +56,6 @@ end
 
 Object = require 'object'
 Deb = require 'deb'
-Downloader = require 'downloader'
 Depiction = require 'depiction'
 
 ui = {}
@@ -68,6 +67,7 @@ require 'ui.gesture'
 
 ns = {}
 require 'ns.target'
+require 'ns.http'
 
 objc.class('AppDelegate', 'UIResponder')
 

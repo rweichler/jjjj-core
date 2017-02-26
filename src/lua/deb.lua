@@ -3,7 +3,8 @@ local Deb = Object.new(super)
 
 function Deb:newfromurl(url, oncomplete, onprogress)
     local self = self:new()
-    local dl = Downloader:new()
+    local dl = ns.http:new()
+    dl.download = true
     dl.url = url
     function dl.handler(dl, path, percent, err)
         if path then

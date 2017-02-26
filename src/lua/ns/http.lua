@@ -1,7 +1,7 @@
 local super = Object
-local Downloader = Object.new(super)
+ns.http = Object.new(super)
 
-function Downloader:new(...)
+function ns.http:new(...)
     local self = super.new(self, ...)
 
     self.m = self.class:alloc():init()
@@ -10,23 +10,24 @@ function Downloader:new(...)
     return self
 end
 
-function Downloader:start()
+function ns.http:start()
     local url = objc.NSURL:URLWithString(self.url)
     local downloadRequest = objc.NSURLRequest:requestWithURL(url)
     local sessionConfig = objc.NSURLSessionConfiguration:defaultSessionConfiguration()
     local urlSession = objc.NSURLSession:sessionWithConfiguration_delegate_delegateQueue(sessionConfig, self.m, objc.NSOperationQueue:mainQueue()):retain()
-    local downloadTask = urlSession:downloadTaskWithRequest(downloadRequest)
-    downloadTask:resume()
+    if self.download then
+        self.downloadTask = urlSession:downloadTaskWithRequest(downloadRequest)
+        self.downloadTask:resume()
+    end
 
     self.session = urlSession
-    self.downloadTask = downloadTask
 end
 
-function Downloader:handler(url, status, err)
+function ns.http:handler(url, status, err)
 end
 
-Downloader.class = objc.GenerateClass()
-local class = Downloader.class
+ns.http.class = objc.GenerateClass()
+local class = ns.http.class
 
 objc.addmethod(class, 'URLSession:downloadTask:didFinishDownloadingToURL:', function(self, session, task, url)
     local this = objc.Lua(self)
@@ -99,4 +100,4 @@ function Downloadbar:new(frame)
     return self
 end
 
-return Downloader
+return ns.http
