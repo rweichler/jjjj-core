@@ -1,12 +1,3 @@
-_G.BACK_BUTTON = {
-    Name = '<-- back',
-    select = function(self, nav)
-        nav[#nav] = nil
-        nav[1] = Deb.List()
-        return true
-    end,
-}
-
 local nav = {}
 _G.NAV = nav
 local lastfiltered
@@ -136,7 +127,27 @@ _G.NAVCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControlle
 _G.NAVHEIGHT = function()
     return 64
 end
-window:setRootViewController(NAVCONTROLLER:retain())
+
+_G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
+end, 'Repos'))
+local path = '/Applications/Cydia.app/install7@2x.png'
+REPOCONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
+
+local path = '/Applications/Cydia.app/manage7@2x.png'
+NAVCONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
+
+_G.ACECONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
+end, 'ace'))
+local path = RES_PATH..'/globe.png'
+ACECONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
+
+_G.TABBARCONTROLLER = objc.UITabBarController:alloc():init()
+TABBARCONTROLLER:setViewControllers{
+    REPOCONTROLLER,
+    NAVCONTROLLER,
+    ACECONTROLLER,
+}
+window:setRootViewController(TABBARCONTROLLER)
 window:makeKeyAndVisible()
 
 

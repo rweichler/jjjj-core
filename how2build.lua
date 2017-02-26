@@ -4,7 +4,7 @@ deb.packageinfo = {
     Name = 'dpkg.app',
     Version = '0.1',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), mobilesubstrate, dpkg, wget, bash, ws.hbang.libopener',
+    Depends = 'firmware (>= 5.0), mobilesubstrate, dpkg, cydia, wget, bash, ws.hbang.libopener',
     Description = 'GUI for dpkg',
     Maintainer = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
     Author = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
@@ -88,6 +88,9 @@ function default()
 
     fs.mkdir('layout/DEBIAN')
     os.pexecute('cp res/DEBIAN/* layout/DEBIAN/')
+
+    -- res
+    os.pexecute('cp -r res/lua layout/'..LUA_PATH..'/res')
 
     deb:make_deb()
 end
