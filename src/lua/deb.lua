@@ -103,25 +103,7 @@ end
 
 function Deb.List(path)
     local t = {}
-    local deb
-    local deblol
-    if not path then
-        deblol = function()
-            local ok = 'ok installed'
-            if deb and string.sub(deb.Status, #deb.Status - #ok + 1, #deb.Status) == ok then
-                t[#t + 1] = deb
-            end
-        end
-    else
-        deblol = function()
-            t[#t + 1] = deb
-        end
-    end
-
-    path = path or '/var/lib/dpkg/status'
-
-    local f = io.open(path, 'r')
-
+    local f = io.open(path or '/var/lib/dpkg/status', 'r')
     if not f then
         t[1] = {}
         t[1].Name = 'Error'
@@ -130,19 +112,34 @@ function Deb.List(path)
         return t
     end
 
+    local filter = path and function(deb) return deb end or function(deb)
+        local x = deb.Status
+        local y = 'ok installed'
+        if x and string.sub(x, #x - #y + 1, #x) == y then
+            return deb
+        end
+    end
+
+    local deb
     for line in f:lines() do
-        local _, _, k, v = string.find(line, '(.*): (.*)')
+        print('///////////// '..line)
+        local k,v = Deb.ParseLine(line)
         if k and v then
-            if k == 'Package' then
-                deblol()
+            if not deb then
+                print('deb = Deb:new()')
                 deb = Deb:new()
-                deb.installed = true
             end
+            print('deb[k] = v')
             deb[k] = v
+        elseif deb then
+            print('t[#t + 1] = filter(deb); deb = nil')
+            t[#t + 1] = filter(deb)
+            deb = nil
         end
     end
     f:close()
-    deblol()
+    t[#t + 1] = deb
+
     local lower = string.lower
     table.sort(t, function(a, b)
         if a.Name and b.Name then

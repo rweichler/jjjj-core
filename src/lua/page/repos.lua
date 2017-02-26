@@ -16,7 +16,7 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
         for i, repo in ipairs(repos) do
             local function callback()
                 local rows = objc.toobj{objc.NSIndexPath:indexPathForRow_inSection(i - 1, 0)}
-                tbl.m:reloadRowsAtIndexPaths_withRowAnimation(rows, UITableViewRowAnimationFade)
+                tbl.m:reloadRowsAtIndexPaths_withRowAnimation(rows, UITableViewRowAnimationNone)
             end
             repo:getrelease(callback)
             repo:geticon(callback)

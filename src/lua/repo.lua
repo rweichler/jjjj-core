@@ -37,10 +37,13 @@ function Repo:getpackages(callback)
         elseif path then
             local home = CACHE_DIR..'/repos'
             os.capture('setuid /bin/mkdir -p '..home)
-            self.path = home..'/'..self.prettyurl
+            self.path = home..'/'..string.gsub(self.prettyurl, '/', '-')
             os.capture('setuid /bin/mv '..path..' '..self.path..'.bz2')
             os.capture('setuid /bin/bunzip2 '..self.path..'.bz2')
             self.debs = Deb.List(self.path)
+            for k, deb in ipairs(self.debs) do
+                print(deb.Package)
+            end
             callback()
         end
     end
