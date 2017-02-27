@@ -5,7 +5,20 @@ end
 
 _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
     m:view():setBackgroundColor(objc.UIColor:whiteColor())
-    local tbl = ui.table:new()
+    local tbl = ui.filtertable:new()
+
+
+    function tbl:search(text, item)
+        local function find(s)
+            if s then
+                local success, result = pcall(string.find, string.lower(s), string.lower(text))
+                return not success or result
+            end
+            return s and string.find(string.lower(s), string.lower(text))
+        end
+        return find(item.Origin) or find(item.Title) or find(item.prettyurl)
+    end
+
     tbl.items = {{'Loading...'}}
     tbl.cell = ui.cell:new()
     tbl:refresh()
@@ -15,22 +28,28 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
     Repo.List(MASTER_REPO_LIST, function(repos)
         for i, repo in ipairs(repos) do
             local function callback()
-                local rows = objc.toobj{objc.NSIndexPath:indexPathForRow_inSection(i - 1, 0)}
-                tbl.m:reloadRowsAtIndexPaths_withRowAnimation(rows, UITableViewRowAnimationNone)
+                for i,v in ipairs(tbl:list()) do
+                    if v == repo then
+                        local rows = objc.toobj{objc.NSIndexPath:indexPathForRow_inSection(i - 1, 0)}
+                        tbl.m:reloadRowsAtIndexPaths_withRowAnimation(rows, UITableViewRowAnimationNone)
+                        break
+                    end
+                end
             end
             repo:getrelease(callback)
             repo:geticon(callback)
         end
-        tbl.items = {repos}
+        --tbl.items = {repos}
+        tbl.deblist = repos
         tbl.cell = ui.cell:new()
         function tbl.cell.onshow(cell, m, section, row)
-            local repo = tbl.items[section][row]
+            local repo = tbl:list()[row]
             m:textLabel():setText(repo.Origin or repo.Title or repo.prettyurl)
             m:detailTextLabel():setText(repo.prettyurl)
             m:imageView():setImage(repo.icon or objc.UIImage:imageWithContentsOfFile('/Applications/Cydia.app/unknown.png'))
         end
         function tbl.cell.onselect(cell, section, row)
-            local repo = tbl.items[section][row]
+            local repo = tbl:list()[row]
             local tbl = ui.table:new()
             tbl.items = {{'Loading...'}}
             tbl.cell = ui.cell:new()

@@ -40,16 +40,16 @@ function ui.filtertable:updatefilter(text)
         self:filter(nil)
     else
         local t = {}
-        local function find(s)
-            return s and string.find(string.lower(s), string.lower(text))
-        end
         for k,v in pairs(self.deblist) do
-            if find(v.Name) or find(v.Package) then
+            if self:search(text, v) then
                 t[#t + 1] = v
             end
         end
         self:filter(t)
     end
+end
+
+function ui.filtertable:search(item)
 end
 
 function ui.filtertable:refresh(skipupdate)

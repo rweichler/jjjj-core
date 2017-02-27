@@ -2,6 +2,17 @@ local tbl = ui.filtertable:new()
 tbl.items = {}
 tbl.deblist = Deb.List()
 
+function tbl:search(text, item)
+    local function find(s)
+        if s then
+            local success, result = pcall(string.find, string.lower(s), string.lower(text))
+            return not success or result
+        end
+        return s and string.find(string.lower(s), string.lower(text))
+    end
+    return find(item.Name) or find(item.Package)
+end
+
 tbl.cell = ui.cell:new()
 tbl.cell.identifier = objc.toobj('lolwatttt')
 function tbl.cell.onselect(_, section, row)
