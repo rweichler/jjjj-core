@@ -1,5 +1,6 @@
 local tbl = ui.filtertable:new()
 tbl.items = {}
+tbl.deblist = Deb.List()
 
 tbl.cell = ui.cell:new()
 tbl.cell.identifier = objc.toobj('lolwatttt')
@@ -34,7 +35,7 @@ end
 tbl:refresh()
 
 HOOK(Deb, 'UpdateList', function(orig, ...)
-    deblist = Deb.List()
+    tbl.deblist = Deb.List()
     tbl:refresh()
     return orig(...)
 end)

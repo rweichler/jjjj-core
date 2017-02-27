@@ -13,49 +13,47 @@ function ui.filtertable:new()
     return self
 end
 
-deblist = Deb.List()
-local lastfiltered, filtered
-local function list()
-    if filtered then
-        if lastfiltered == deblist then
-            return filtered
+function ui.filtertable:list()
+    if self.filtered then
+        if self.lastfiltered == self.deblist then
+            return self.filtered
         else
-            filtered = nil
+            self.filtered = nil
         end
     end
-    lastfiltered = nil
-    return deblist
+    self.lastfiltered = nil
+    return self.deblist
 end
 
-local function filter(t)
-    filtered = t
-    if filtered then
-        lastfiltered = deblist
+function ui.filtertable:filter(t)
+    self.filtered = t
+    if self.filtered then
+        self.lastfiltered = self.deblist
     else
-        lastfiltered = nil
+        self.lastfiltered = nil
     end
 end
 
 function ui.filtertable:updatefilter(text)
     text = text or (self.searchbar and objc.tolua(self.searchbar.m:text()) or '')
     if text == '' then
-        filter(nil)
+        self:filter(nil)
     else
         local t = {}
         local function find(s)
             return s and string.find(string.lower(s), string.lower(text))
         end
-        for k,v in pairs(deblist) do
+        for k,v in pairs(self.deblist) do
             if find(v.Name) or find(v.Package) then
                 t[#t + 1] = v
             end
         end
-        filter(t)
+        self:filter(t)
     end
 end
 
 function ui.filtertable:refresh(skipupdate)
-    self.items[1] = list()
+    self.items[1] = self:list() or self.items[1]
     if not skipupdate then
         self:updatefilter()
     end
