@@ -221,11 +221,11 @@ function Depiction:addbutton(m, appendtext)
         local button = objc.UIBarButtonItem:alloc():initWithTitle_style_target_action('Download', UIBarButtonItemStylePlain, target.m, target.sel)
         m:navigationItem():setRightBarButtonItem(button)
         function target.onaction()
-            if not(string.sub(self.deb.Filename, 1, 2) == './') then
-                C.alert_display('NOPE', 'NOPE', 'Dismiss', nil, nil)
-                return
+            local path = self.deb.Filename
+            if string.sub(path, 1, 2) == './' then
+                path = string.sub(path, 3, #path)
             end
-            local url = self.deb.repo.url..string.sub(self.deb.Filename, 3, #self.deb.Filename)
+            local url = self.deb.repo.url..path
             m:navigationItem():setRightBarButtonItem(nil)
             self:viewdownload(m)
             self:startdownload(url)
