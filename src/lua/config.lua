@@ -3,5 +3,4 @@ RES_PATH = PATH..'/res'
 
 
 local config = {}
-
 return config
