@@ -42,7 +42,7 @@ function Deb.ParseLine(line)
     end
 end
 
-function Deb:gettweaks()
+function Deb:getfiles()
     local cmd, regex
     if self.installed then
         cmd = '/usr/bin/dpkg -L '..self.Package
@@ -52,22 +52,30 @@ function Deb:gettweaks()
         regex = '.*%s+%.(/.*)'
     end
 
-    local tweaks = {}
+    local files = {}
     for line in (os.capture('setuid '..cmd).."\n"):gmatch"(.-)\n" do
         local path = string.match(line, regex)
         if path then
-            local base = string.match(path, '('..SUBSTRATE_DIR..'/.+)%.dylib')
-            if base then
-                local dict = objc.NSDictionary:alloc():initWithContentsOfFile(base..'.plist')
-                if dict then
-                    local tweak = objc.tolua(dict)
-                    tweak.name = string.sub(base, #SUBSTRATE_DIR + 2, #base)
-                    tweaks[#tweaks + 1] = tweak
-                end
-            end
+            files[#files + 1] = path
         end
     end
 
+    return files
+end
+
+function Deb:gettweaks()
+    local tweaks = {}
+    for k, path in ipairs(self:getfiles()) do
+        local base = string.match(path, '('..SUBSTRATE_DIR..'/.+)%.dylib')
+        if base then
+            local dict = objc.NSDictionary:alloc():initWithContentsOfFile(base..'.plist')
+            if dict then
+                local tweak = objc.tolua(dict)
+                tweak.name = string.sub(base, #SUBSTRATE_DIR + 2, #base)
+                tweaks[#tweaks + 1] = tweak
+            end
+        end
+    end
     return tweaks
 end
 

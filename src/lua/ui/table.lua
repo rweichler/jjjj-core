@@ -7,7 +7,8 @@ function ui.table:new()
     objc.Lua(self.m, self)
     self.m:setDelegate(self.m)
     self.m:setDataSource(self.m)
-    self.items = {{}}
+    self.items = {}
+    self.cell = ui.cell:new()
     return self
 end
 
