@@ -8,6 +8,7 @@ package.path = PATH..'/?.lua;'..
                PATH..'/?/init.lua;'..
                package.path
 
+require 'constants'
 config = require 'config'
 ffi = require 'ffi'
 C = ffi.C

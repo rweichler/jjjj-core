@@ -123,6 +123,29 @@ function Depiction:view(m)
     self:addbutton(m, appendtext)
 end
 
+function Depiction:checksubstrate()
+    for i,tweak in ipairs(self.deb:gettweaks()) do
+        if tweak.Filter and tweak.Filter.Bundles and string.lower(tweak.Filter.Bundles[1]) == 'com.apple.springboard' then
+            C.alert_display('SpringBoard tweak detected', 'Would you like to inject it? Otherwise, a respring is required.', 'No', 'Inject', function()
+                -- TODO make this less hacky
+                local ps = os.capture('ps aux | grep SpringBoard')
+                local pid = string.match(ps, 'mobile%s+(%d+).*')
+                local result = ''
+                C.pipeit('setuid /usr/bin/cynject '..pid..' '..SUBSTRATE_DIR..'/'..tweak.name..'.dylib', function(str, status)
+                    if str == ffi.NULL then
+                        if status == 0 then
+                        else
+                            C.alert_display('Failed', result, 'Dismiss', nil, nil)
+                        end
+                    else
+                        result = result..ffi.string(str)
+                    end
+                end)
+            end)
+        end
+    end
+end
+
 function Depiction:addbutton(m, appendtext)
     if self.deb.installed then
 
@@ -180,6 +203,7 @@ function Depiction:addbutton(m, appendtext)
                         --POPCONTROLLER()
                         Deb.UpdateList()
                         self:addbutton(m, appendtext)
+                        self:checksubstrate()
                     else
                         C.alert_display('Failed', result, 'Dismiss', nil, nil)
                         target.onaction = oldtoggle

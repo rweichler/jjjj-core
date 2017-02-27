@@ -42,6 +42,35 @@ function Deb.ParseLine(line)
     end
 end
 
+function Deb:gettweaks()
+    local cmd, regex
+    if self.installed then
+        cmd = '/usr/bin/dpkg -L '..self.Package
+        regex = '(.*)'
+    else
+        cmd = '/usr/bin/dpkg-deb --contents '..self.path
+        regex = '.*%s+%.(/.*)'
+    end
+
+    local tweaks = {}
+    for line in (os.capture('setuid '..cmd).."\n"):gmatch"(.-)\n" do
+        local path = string.match(line, regex)
+        if path then
+            local base = string.match(path, '('..SUBSTRATE_DIR..'/.+)%.dylib')
+            if base then
+                local dict = objc.NSDictionary:alloc():initWithContentsOfFile(base..'.plist')
+                if dict then
+                    local tweak = objc.tolua(dict)
+                    tweak.name = string.sub(base, #SUBSTRATE_DIR + 2, #base)
+                    tweaks[#tweaks + 1] = tweak
+                end
+            end
+        end
+    end
+
+    return tweaks
+end
+
 local control_dir = '/var/tmp/dpkgappcontrol'
 function Deb:init(path)
     local function cleanup()

@@ -32,6 +32,10 @@ void alert_input(const char *title, const char *msg, const char *cancel, const c
 void pipeit(const char *cmd, void (*callback)(const char *, int));
 void animateit(float duration, float delay, int options, void (*animations)(), void (*completion)(bool));
 
+
+typedef void *CFNotificationCenterRef;
+void CFNotificationCenterPostNotification(CFNotificationCenterRef center, id name, const void *object, id userInfo, bool deliverImmediately);
+CFNotificationCenterRef CFNotificationCenterGetDarwinNotifyCenter(void);
 ]]
 UITableViewRowAnimationFade     = 0
 UITableViewRowAnimationRight    = 1

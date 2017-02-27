@@ -12,7 +12,7 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
     tbl.m:setFrame(m:view():bounds())
     m:view():addSubview(tbl.m)
 
-    Repo.List('https://raw.githubusercontent.com/jonluca/MasterRepo/master/masterrepoeasyinstall/etc/apt/sources.list.d/MasterRepo.list', function(repos)
+    Repo.List(MASTER_REPO_LIST, function(repos)
         for i, repo in ipairs(repos) do
             local function callback()
                 local rows = objc.toobj{objc.NSIndexPath:indexPathForRow_inSection(i - 1, 0)}
