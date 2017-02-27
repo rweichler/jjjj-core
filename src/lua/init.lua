@@ -77,6 +77,7 @@ Repo = require 'repo'
 
 ui = {}
 require 'ui.table'
+require 'ui.filtertable'
 require 'ui.cell'
 require 'ui.searchbar'
 require 'ui.button'
