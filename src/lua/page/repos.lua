@@ -8,17 +8,6 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
     local tbl = ui.filtertable:new()
 
 
-    function tbl:search(text, item)
-        local function find(s)
-            if s then
-                local success, result = pcall(string.find, string.lower(s), string.lower(text))
-                return not success or result
-            end
-            return s and string.find(string.lower(s), string.lower(text))
-        end
-        return find(item.Origin) or find(item.Title) or find(item.prettyurl)
-    end
-
     tbl.items = {{'Loading...'}}
     tbl.cell = ui.cell:new()
     tbl:refresh()
@@ -32,6 +21,17 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
     }
 
     Repo.List(MASTER_REPO_LIST, function(repos)
+
+        function tbl:search(text, item)
+            local function find(s)
+                if s then
+                    local success, result = pcall(string.find, string.lower(s), string.lower(text))
+                    return not success or result
+                end
+                return s and string.find(string.lower(s), string.lower(text))
+            end
+            return find(item.Origin) or find(item.Title) or find(item.prettyurl)
+        end
         for _,url in pairs(legacy) do
             -- cydia defaults use weird urls
             local repo = Repo:new(url)
@@ -72,51 +72,57 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
         function tbl.cell.onselect(_, section, row)
             local repo = tbl:list()[row]
             local tbl = ui.filtertable:new()
-            function tbl:search(text, item)
-                local function find(s)
-                    if s then
-                        local success, result = pcall(string.find, string.lower(s), string.lower(text))
-                        return not success or result
-                    end
-                    return s and string.find(string.lower(s), string.lower(text))
-                end
-                return find(item.Name) or find(item.Package) or find(item.Description)
-            end
             tbl.items = {{'Loading...'}}
             tbl.cell = ui.cell:new()
             tbl:refresh()
 
-            repo:getpackages(function()
-                tbl.deblist = repo.debs
-                tbl.cell = ui.cell:new()
-                function tbl.cell.onshow(_, m, section, row)
-                    local deb = tbl:list()[row]
-                    m:textLabel():setText(deb.Name or deb.Package)
-                    m:detailTextLabel():setText(deb.Description)
-
-                    local img = nil
-                    if deb.Section then
-                        local path = '/Applications/Cydia.app/Sections/'..string.gsub(deb.Section, ' ', '_')..'.png'
-                        local f = io.open(path, 'r')
-                        if f then
-                            f:close()
-                        else
-                            img = repo.icon
-                            path = '/Applications/Cydia.app/unknown.png'
+            repo:getpackages(function(progressmsg)
+                if progressmsg then
+                    tbl.items[1][1] = progressmsg
+                    local rows = objc.toobj{objc.NSIndexPath:indexPathForRow_inSection(0, 0)}
+                    tbl.m:reloadRowsAtIndexPaths_withRowAnimation(rows, UITableViewRowAnimationNone)
+                else
+                    function tbl:search(text, item)
+                        local function find(s)
+                            if s then
+                                local success, result = pcall(string.find, string.lower(s), string.lower(text))
+                                return not success or result
+                            end
+                            return s and string.find(string.lower(s), string.lower(text))
                         end
-                        img = img or objc.UIImage:imageWithContentsOfFile(path)
+                        return find(item.Name) or find(item.Package) or find(item.Description)
                     end
+                    tbl.deblist = repo.debs
+                    tbl.cell = ui.cell:new()
+                    function tbl.cell.onshow(_, m, section, row)
+                        local deb = tbl:list()[row]
+                        m:textLabel():setText(deb.Name or deb.Package)
+                        m:detailTextLabel():setText(deb.Description)
 
-                    m:imageView():setImage(img)
+                        local img = nil
+                        if deb.Section then
+                            local path = '/Applications/Cydia.app/Sections/'..string.gsub(deb.Section, ' ', '_')..'.png'
+                            local f = io.open(path, 'r')
+                            if f then
+                                f:close()
+                            else
+                                img = repo.icon
+                                path = '/Applications/Cydia.app/unknown.png'
+                            end
+                            img = img or objc.UIImage:imageWithContentsOfFile(path)
+                        end
+
+                        m:imageView():setImage(img)
+                    end
+                    function tbl.cell.onselect(_, section, row)
+                        local depiction = Depiction:new()
+                        depiction.deb = tbl:list()[row]
+                        PUSHCONTROLLER(function(m)
+                            depiction:view(m)
+                        end, depiction:gettitle())
+                    end
+                    tbl:refresh()
                 end
-                function tbl.cell.onselect(_, section, row)
-                    local depiction = Depiction:new()
-                    depiction.deb = tbl:list()[row]
-                    PUSHCONTROLLER(function(m)
-                        depiction:view(m)
-                    end, depiction:gettitle())
-                end
-                tbl:refresh()
             end)
 
             PUSHCONTROLLER(function(m)

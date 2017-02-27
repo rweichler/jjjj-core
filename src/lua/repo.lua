@@ -47,29 +47,43 @@ function Repo:getpackages(callback, ext)
                     self:getpackages(callback, 'Index')
                 end
             end
+        elseif percent then
+            callback('Downloading Packages'..ext..'... '..math.floor(percent*100 + 0.5)..'%')
         elseif path then
             local home = CACHE_DIR..'/repos'
             os.capture('setuid /bin/mkdir -p '..home)
             self.path = home..'/'..string.gsub(self.prettyurl, '/', '-')
             os.capture('setuid /bin/mv '..path..' '..self.path..ext)
             os.capture('setuid /bin/rm -f '..self.path)
-            local result, status
+            callback('Extracting...')
+            local cmd
             if map[ext] then
-                result, status = os.capture('setuid '..map[ext]..' '..self.path..ext)
-                os.capture('setuid /bin/rm -f '..self.path..ext)
+                cmd = 'setuid '..map[ext]..' '..self.path..ext
             else
-                result, status = os.capture('setuid /bin/mv '..self.path..ext..' '..self.path)
+                cmd = 'setuid /bin/cp '..self.path..ext..' '..self.path
             end
-            if status == 0 then
-                self.debs = Deb.List(self.path)
-                for k, deb in ipairs(self.debs) do
-                    deb.repo = self
-                    --print(deb.Package)
+            local result = ''
+            C.pipeit(cmd, function(line, status)
+                if line == ffi.NULL then
+                    if status == 0 then
+                        callback('Importing to Lua table...')
+                        C.pipeit('setuid /bin/rm -f'..self.path..ext, function(line, status)
+                            if line == ffi.NULL then
+                                self.debs = Deb.List(self.path)
+                                for k, deb in ipairs(self.debs) do
+                                    deb.repo = self
+                                    --print(deb.Package)
+                                end
+                                callback()
+                            end
+                        end)
+                    else
+                        print('ERROR: '..result)
+                    end
+                else
+                    result = result..ffi.string(line)
                 end
-            else
-                print('ERROR: '..result)
-            end
-            callback()
+            end)
         end
     end
     dl:start()

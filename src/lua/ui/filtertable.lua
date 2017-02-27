@@ -38,7 +38,7 @@ function ui.filtertable:updatefilter(text)
     text = text or (self.searchbar and objc.tolua(self.searchbar.m:text() or '') or '')
     if text == '' then
         self:filter(nil)
-    else
+    elseif self.deblist then
         local t = {}
         for k,v in pairs(self.deblist) do
             if self:search(text, v) then
@@ -50,6 +50,7 @@ function ui.filtertable:updatefilter(text)
 end
 
 function ui.filtertable:search(item)
+    return true
 end
 
 function ui.filtertable:refresh(skipupdate)
