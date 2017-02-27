@@ -25,7 +25,29 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
     tbl.m:setFrame(m:view():bounds())
     m:view():addSubview(tbl.m)
 
+    local legacy = {
+        'http://apt.thebigboss.org/repofiles/cydia/',
+        'http://cydia.zodttd.com/repo/cydia/',
+        'http://apt.modmyi.com/',
+    }
+
     Repo.List(MASTER_REPO_LIST, function(repos)
+        for _,url in pairs(legacy) do
+            local repo = Repo:new(url)
+            repo.packagesurl = url..'dists/stable/main/binary-iphoneos-arm/'
+            repo.releaseurl = url..'dists/stable/'
+            repos[#repos + 1] = repo
+
+        end
+
+        do
+            -- saurik needs special treatment
+            local repo = Repo:new('http://apt.saurik.com/')
+            repo.releaseurl = repo.url..'dists/ios/1348.22/'
+            repo.packagesurl = repo.url..'dists/ios/1348.22/main/binary-darwin-arm/'
+            repos[#repos + 1] = repo
+        end
+
         for i, repo in ipairs(repos) do
             local function callback()
                 for i,v in ipairs(tbl:list()) do

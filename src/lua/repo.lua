@@ -11,7 +11,7 @@ end
 
 function Repo:getrelease(callback)
     local dl = ns.http:new()
-    dl.url = self.url..'Release'
+    dl.url = (self.releaseurl or self.url)..'Release'
     function dl.handler(dl, data, percent, errcode)
         if errcode then
         elseif data then
@@ -36,7 +36,7 @@ map['Index'] = 'bin/touch'
 function Repo:getpackages(callback, ext)
     ext = ext or '.bz2'
     local dl = ns.http:new()
-    dl.url = self.url..'Packages'..ext
+    dl.url = (self.packagesurl or self.url)..'Packages'..ext
     dl.download = true
     function dl.handler(dl, path, percent, errcode)
         if errcode then
@@ -77,7 +77,7 @@ end
 
 function Repo:geticon(callback)
     local dl = ns.http:new()
-    dl.url = self.url..'CydiaIcon.png'
+    dl.url = (self.releaseurl or self.url)..'CydiaIcon.png'
     function dl.handler(dl, data, percent, errcode)
         if data then
             self.icon = objc.UIImage:alloc():initWithData(data)
