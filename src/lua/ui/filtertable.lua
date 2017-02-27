@@ -35,7 +35,7 @@ function ui.filtertable:filter(t)
 end
 
 function ui.filtertable:updatefilter(text)
-    text = text or (self.searchbar and objc.tolua(self.searchbar.m:text()) or '')
+    text = text or (self.searchbar and objc.tolua(self.searchbar.m:text() or '') or '')
     if text == '' then
         self:filter(nil)
     else
