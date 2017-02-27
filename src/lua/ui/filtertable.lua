@@ -49,7 +49,7 @@ function ui.filtertable:updatefilter(text)
     end
 end
 
-function ui.filtertable:search(item)
+function ui.filtertable:search(text, item)
     return true
 end
 
