@@ -64,24 +64,34 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
         --tbl.items = {repos}
         tbl.deblist = repos
         tbl.cell = ui.cell:new()
-        function tbl.cell.onshow(cell, m, section, row)
+        function tbl.cell.onshow(_, m, section, row)
             local repo = tbl:list()[row]
             m:textLabel():setText(repo.Origin or repo.Title or repo.prettyurl)
             m:detailTextLabel():setText(repo.prettyurl)
             m:imageView():setImage(repo.icon or objc.UIImage:imageWithContentsOfFile('/Applications/Cydia.app/unknown.png'))
         end
-        function tbl.cell.onselect(cell, section, row)
+        function tbl.cell.onselect(_, section, row)
             local repo = tbl:list()[row]
-            local tbl = ui.table:new()
+            local tbl = ui.filtertable:new()
+            function tbl:search(text, item)
+                local function find(s)
+                    if s then
+                        local success, result = pcall(string.find, string.lower(s), string.lower(text))
+                        return not success or result
+                    end
+                    return s and string.find(string.lower(s), string.lower(text))
+                end
+                return find(item.Name) or find(item.Package) or find(item.Description)
+            end
             tbl.items = {{'Loading...'}}
             tbl.cell = ui.cell:new()
             tbl:refresh()
 
             repo:getpackages(function()
-                tbl.items = {repo.debs}
+                tbl.deblist = repo.debs
                 tbl.cell = ui.cell:new()
-                function tbl.cell.onshow(cell, m, section, row)
-                    local deb = tbl.items[section][row]
+                function tbl.cell.onshow(_, m, section, row)
+                    local deb = tbl:list()[row]
                     m:textLabel():setText(deb.Name or deb.Package)
                     m:detailTextLabel():setText(deb.Description)
 
@@ -100,9 +110,9 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
 
                     m:imageView():setImage(img)
                 end
-                function tbl.cell.onselect(cell, section, row)
+                function tbl.cell.onselect(_, section, row)
                     local depiction = Depiction:new()
-                    depiction.deb = tbl.items[section][row]
+                    depiction.deb = tbl:list()[row]
                     PUSHCONTROLLER(function(m)
                         depiction:view(m)
                     end, depiction:gettitle())
