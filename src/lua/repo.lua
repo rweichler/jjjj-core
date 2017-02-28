@@ -50,13 +50,17 @@ local function import_lua_table(self, callback, ext)
     end)
 end
 
+local function last_modified_warning(self)
+    C.alert_display('Warning', 'This repo does not support the Last-Modified header. This makes listings load slower. Please notify the owner of '..self.prettyurl..' if possible.', 'Dismiss', nil, nil)
+end
+
 local function doit(self, callback, info)
     local dl = ns.http:new()
     dl.getheaders = true
     dl.url = self.url..'Packages'..info.ext
     function dl.handler(_, data, percent, errcode)
         if not dl.headers['Last-Modified'] then
-            C.alert_display('Warning', 'This repo does not support the Last-Modified header. This makes listings load slower. Please notify the owner of '..self.prettyurl..' if possible.', 'Dismiss', nil, nil)
+            last_modified_warning(self)
         end
         if dl.headers['Last-Modified'] == info.last then
             os.capture('setuid /bin/mkdir -p '..HOME)
@@ -102,12 +106,16 @@ function Repo:getpackages(callback, ext)
         elseif path then
             os.capture('setuid /bin/mkdir -p '..cachedatadir)
             os.capture('setuid /bin/chown -R mobile '..cachedatadir)
-            local f = io.open(cachedatadir..'/'..self.cacheurl..'.lua', 'w')
-            f:write('return {\n')
-            f:write('    last = '..dl.headers['Last-Modified']..',\n')
-            f:write('    ext = "'..ext..'",\n')
-            f:write('}')
-            f:close()
+            if dl.headers['Last-Modified'] then
+                local f = io.open(cachedatadir..'/'..self.cacheurl..'.lua', 'w')
+                f:write('return {\n')
+                f:write('    last = '..dl.headers['Last-Modified']..',\n')
+                f:write('    ext = "'..ext..'",\n')
+                f:write('}')
+                f:close()
+            else
+                last_modified_warning(self)
+            end
             os.capture('setuid /bin/mkdir -p '..HOME)
             self.path = HOME..'/'..self.cacheurl
             os.capture('setuid /bin/mv '..path..' '..self.path..ext)
