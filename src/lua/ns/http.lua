@@ -13,6 +13,9 @@ end
 function ns.http:start()
     local url = objc.NSURL:URLWithString(self.url)
     local request = objc.NSMutableURLRequest:requestWithURL(url)
+    request:setValue_forHTTPHeaderField('Cydia/0.9 CFNetwork/808.2.16 Darwin/16.3.0', 'User-Agent')
+    request:setValue_forHTTPHeaderField('iPhone6,1', 'X-Machine')
+    request:setValue_forHTTPHeaderField('a253b3a7b970ec38008f04b9cd63be9a2b941c45', 'X-Unique-ID')
     if self.getheaders then
         request:setHTTPMethod('HEAD')
     end
@@ -100,14 +103,19 @@ objc.addmethod(class, 'URLSession:task:didCompleteWithError:', function(self, se
     if err and not(err == ffi.NULL) then
         local desc = err.description
         this:handler(nil, nil, objc.tolua(desc))
-    elseif not this.download and this.mdata then
+    elseif not this.download then
         local response = task:response()
-        local status = tonumber(response:statusCode())
-        if status >= 200 and status < 300 then
-            local data = this.mdata
-            this.mdata = nil
-            this:handler(data)
-        else
+        local status = response and tonumber(response:statusCode())
+        if this.mdata then
+            if status >= 200 and status < 300 then
+                local data = this.mdata
+                this.mdata = nil
+                this:handler(data)
+            else
+                this:handler(nil, nil, status)
+            end
+        elseif status then
+            this:parseheaders(objc.tolua(task:response():allHeaderFields()))
             this:handler(nil, nil, status)
         end
     end

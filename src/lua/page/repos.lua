@@ -50,7 +50,7 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
             table.insert(repos, 1, repo)
         end
 
-        do -- saurik's repo also needs special treatment
+        do -- saurik's repo needs special treatment
             local repo = Repo:new('http://apt.saurik.com/')
             repo.releaseurl = repo.url..'dists/ios/1348.22/'
             repo.packagesurl = repo.url..'dists/ios/1348.22/main/binary-iphoneos-arm/'

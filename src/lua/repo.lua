@@ -6,6 +6,7 @@ function Repo:new(url)
     self.url = url
     self.prettyurl = string.gsub(string.gsub(self.url, 'http://', ''), 'https://', '')
     self.prettyurl = string.sub(self.prettyurl, 1, #self.prettyurl - 1)
+    self.cacheurl = string.gsub(self.prettyurl, '/', '-')
     return self
 end
 
@@ -33,26 +34,82 @@ map['.bz2'] = '/bin/bunzip2'
 map['.gz'] = '/bin/gzip -d'
 map['Index'] = 'bin/touch'
 
+local HOME = CACHE_DIR..'/repos'
+
+local function import_lua_table(self, callback, ext)
+    callback('Importing to Lua table...')
+    C.pipeit('setuid /bin/rm -f '..self.path..ext, function(line, status)
+        if line == ffi.NULL then
+            self.debs = Deb.List(self.path)
+            for k, deb in ipairs(self.debs) do
+                deb.repo = self
+                --print(deb.Package)
+            end
+            callback()
+        end
+    end)
+end
+
+local function doit(self, callback, info)
+    local dl = ns.http:new()
+    dl.getheaders = true
+    dl.url = self.url..'Packages'..info.ext
+    function dl.handler(_, data, percent, errcode)
+        if not dl.headers['Last-Modified'] then
+            C.alert_display('Warning', 'This repo does not support the Last-Modified header. This makes listings load slower. Please notify the owner of '..self.prettyurl..' if possible.', 'Dismiss', nil, nil)
+        end
+        if dl.headers['Last-Modified'] == info.last then
+            os.capture('setuid /bin/mkdir -p '..HOME)
+            self.path = HOME..'/'..self.cacheurl
+            import_lua_table(self, callback, info.ext)
+        else
+            self:getpackages(callback, '.bz2')
+        end
+    end
+    dl:start()
+end
+
+local cachedatadir = CACHE_DIR..'/repos/cachedata'
 function Repo:getpackages(callback, ext)
+    if not ext then
+        local path = cachedatadir..'/'..self.cacheurl..'.lua'
+        local f = io.open(path, 'r')
+        if f then
+            f:close()
+            doit(self, callback, dofile(path))
+            return
+        end
+    end
     ext = ext or '.bz2'
     local dl = ns.http:new()
     dl.url = (self.packagesurl or self.url)..'Packages'..ext
     dl.download = true
-    function dl.handler(dl, path, percent, errcode)
+    function dl.handler(_, path, percent, errcode)
         if errcode then
             if errcode == 404 then
                 if ext == '.bz2' then
                     self:getpackages(callback, '.gz')
                 elseif ext == '.gz' then
                     self:getpackages(callback, 'Index')
+                else
+                    callback("Error: can't find packages on this repo")
                 end
+            else
+                callback("Error: can't find packages on this repo")
             end
         elseif percent then
             callback('Downloading Packages'..ext..'... '..math.floor(percent*100 + 0.5)..'%')
         elseif path then
-            local home = CACHE_DIR..'/repos'
-            os.capture('setuid /bin/mkdir -p '..home)
-            self.path = home..'/'..string.gsub(self.prettyurl, '/', '-')
+            os.capture('setuid /bin/mkdir -p '..cachedatadir)
+            os.capture('setuid /bin/chown -R mobile '..cachedatadir)
+            local f = io.open(cachedatadir..'/'..self.cacheurl..'.lua', 'w')
+            f:write('return {\n')
+            f:write('    last = '..dl.headers['Last-Modified']..',\n')
+            f:write('    ext = "'..ext..'",\n')
+            f:write('}')
+            f:close()
+            os.capture('setuid /bin/mkdir -p '..HOME)
+            self.path = HOME..'/'..self.cacheurl
             os.capture('setuid /bin/mv '..path..' '..self.path..ext)
             os.capture('setuid /bin/rm -f '..self.path)
             callback('Extracting...')
@@ -66,19 +123,10 @@ function Repo:getpackages(callback, ext)
             C.pipeit(cmd, function(line, status)
                 if line == ffi.NULL then
                     if status == 0 then
-                        callback('Importing to Lua table...')
-                        C.pipeit('setuid /bin/rm -f'..self.path..ext, function(line, status)
-                            if line == ffi.NULL then
-                                self.debs = Deb.List(self.path)
-                                for k, deb in ipairs(self.debs) do
-                                    deb.repo = self
-                                    --print(deb.Package)
-                                end
-                                callback()
-                            end
-                        end)
+                        import_lua_table(self, callback, ext)
                     else
-                        print('ERROR: '..result)
+                        C.alert_display('Could not extract Packages'..ext, result, 'Dismiss', nil, nil)
+                        callback('Something went wrong :(')
                     end
                 else
                     result = result..ffi.string(line)
