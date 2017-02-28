@@ -30,20 +30,19 @@ function Repo:getrelease(callback)
 end
 
 local map = {}
-map['.bz2'] = '/bin/bunzip2'
-map['.gz'] = '/bin/gzip -d'
-map['Index'] = 'bin/touch'
+map['.bz2'] = 'bunzip2'
+map['.gz'] = 'gzip -d'
+map['Index'] = 'touch'
 
 local HOME = CACHE_DIR..'/repos'
 
 local function import_lua_table(self, callback, ext)
     callback('Importing to Lua table...')
-    Cmd('rm -f '..self.path..ext, function(line, status)
+    C.run_async(function()
         if line == ffi.NULL then
             self.debs = Deb.List(self.path)
             for k, deb in ipairs(self.debs) do
                 deb.repo = self
-                --print(deb.Package)
             end
             callback()
         end
@@ -63,7 +62,7 @@ local function doit(self, callback, info)
             last_modified_warning(self)
         end
         if dl.headers['Last-Modified'] == info.last then
-            os.capture('setuid /bin/mkdir -p '..HOME)
+            os.setuid('mkdir -p '..HOME)
             self.path = HOME..'/'..self.cacheurl
             import_lua_table(self, callback, info.ext)
         else
@@ -73,7 +72,7 @@ local function doit(self, callback, info)
     dl:start()
 end
 
-local cachedatadir = CACHE_DIR..'/repos/cachedata'
+local cachedatadir = HOME..'/cachedata'
 function Repo:getpackages(callback, ext)
     if not ext then
         local path = cachedatadir..'/'..self.cacheurl..'.lua'
@@ -105,8 +104,8 @@ function Repo:getpackages(callback, ext)
         elseif percent then
             callback('Downloading Packages'..ext..'... '..math.floor(percent*100 + 0.5)..'%')
         elseif path then
-            os.capture('setuid /bin/mkdir -p '..cachedatadir)
-            os.capture('setuid /bin/chown -R mobile '..cachedatadir)
+            os.setuid('mkdir -p '..cachedatadir)
+            os.setuid('chown -R mobile '..cachedatadir)
             if dl.headers['Last-Modified'] then
                 local f = io.open(cachedatadir..'/'..self.cacheurl..'.lua', 'w')
                 f:write('return {\n')
@@ -117,10 +116,10 @@ function Repo:getpackages(callback, ext)
             else
                 last_modified_warning(self)
             end
-            os.capture('setuid /bin/mkdir -p '..HOME)
+            os.setuid('mkdir -p '..HOME)
             self.path = HOME..'/'..self.cacheurl
-            os.capture('setuid /bin/mv '..path..' '..self.path..ext)
-            os.capture('setuid /bin/rm -f '..self.path)
+            os.setuid('mv '..path..' '..self.path..ext)
+            os.setuid('rm -f '..self.path)
             callback('Extracting...')
             local cmd
             if map[ext] then
@@ -129,9 +128,13 @@ function Repo:getpackages(callback, ext)
                 cmd = 'cp '..self.path..ext..' '..self.path
             end
             local result = ''
+            -- TODO make the package cache
+            -- a Lua script (so that it opens
+            -- faster)
             Cmd(cmd, function(line, status)
                 if line == ffi.NULL then
                     if status == 0 then
+                        os.setuid('rm -f '..self.path..ext)
                         import_lua_table(self, callback, ext)
                     else
                         C.alert_display('Could not extract Packages'..ext, result, 'Dismiss', nil, nil)

@@ -1,14 +1,18 @@
 #import <UIKit/UIKit.h>
 
+static dispatch_queue_t _queue = NULL;
+static dispatch_queue_t queue()
+{
+    if(_queue == NULL) {
+        _queue = dispatch_queue_create("OISDJFDSOI", NULL);
+    }
+    return _queue;
+}
+
 // TODO: figure out a better interface for this
-static dispatch_queue_t queue = NULL;
 void pipeit(const char *cmd, void (*callback)(const char *, int))
 {
-    if(queue == NULL) {
-        queue = dispatch_queue_create("OISDJFDSOI", NULL);
-    }
-    dispatch_queue_t oldQueue = dispatch_get_current_queue();
-    dispatch_async(queue, ^{
+    dispatch_async(queue(), ^{
 
         FILE *fp;
         char path[1035];
@@ -26,15 +30,24 @@ void pipeit(const char *cmd, void (*callback)(const char *, int))
         while (fgets(path, sizeof(path)-1, fp) != NULL) {
             char *tmp = malloc(strlen(path) + 1);
             strcpy(tmp, path);
-            dispatch_async(oldQueue, ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 callback(tmp, 0);
                 free(tmp);
             });
         }
 
         int status = pclose(fp) / 256;
-        dispatch_async(oldQueue, ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             callback(NULL, status);
+        });
+    });
+}
+
+void run_async(void (*callback)())
+{
+    dispatch_async(queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            callback();
         });
     });
 }

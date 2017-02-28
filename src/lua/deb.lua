@@ -45,15 +45,15 @@ end
 function Deb:getfiles()
     local cmd, regex
     if self.installed then
-        cmd = '/usr/bin/dpkg -L '..self.Package
+        cmd = 'dpkg -L '..self.Package
         regex = '(.*)'
     else
-        cmd = '/usr/bin/dpkg-deb --contents '..self.path
+        cmd = 'dpkg-deb --contents '..self.path
         regex = '.*%s+%.(/.*)'
     end
 
     local files = {}
-    for line in (os.capture('setuid '..cmd).."\n"):gmatch"(.-)\n" do
+    for line in os.setuid(cmd):gmatch"(.-)\n" do
         local path = string.match(line, regex)
         if path then
             files[#files + 1] = path
@@ -82,7 +82,7 @@ end
 local control_dir = '/var/tmp/dpkgappcontrol'
 function Deb:init(path)
     local function cleanup()
-        os.capture('setuid /bin/rm -rf '..control_dir)
+        os.setuid('rm -rf '..control_dir)
     end
     local function die(reason)
         C.alert_display('Failed getting deb info', reason, 'Dismiss', nil, nil)
@@ -90,8 +90,7 @@ function Deb:init(path)
     end
 
     cleanup()
-    local result = ''
-    local result, status = os.capture('setuid /usr/bin/dpkg-deb --control '..path..' '..control_dir)
+    local result, status = os.setuid('dpkg-deb --control '..path..' '..control_dir)
     if not(status == 0) then
         die(result)
         return false
@@ -115,8 +114,8 @@ function Deb:init(path)
     end
 
     local newpath = CACHE_DIR..'/'..self.Package..'.deb'
-    os.capture('setuid /bin/mkdir -p '..CACHE_DIR)
-    os.capture('setuid /bin/mv '..path..' '..newpath)
+    os.setuid('mkdir -p '..CACHE_DIR)
+    os.setuid('mv '..path..' '..newpath)
 
     self.path = newpath
     cleanup()

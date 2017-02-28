@@ -49,9 +49,9 @@ if ffi.arch == 'arm64' then
         C.closedir(dir)
         return t
     end
-else--if ffi.arch == 'armv7' then
-    -- this is a hack that stopped working on iOS 10.
-    -- i need to port that cdef above to armv7
+else
+    -- this is a hack. doesnt work on a lot of iOS versions.
+    -- i need to port that cdef above to 32bit
     function ls(directory)
         local i = 0
         local t = {}
@@ -84,6 +84,13 @@ function os.capture(cmd, noerr)
     local s = assert(f:read('*a'))
     local rc = {f:close()}
     return string.sub(s, 1, #s - 1), rc[3]
+end
+
+function os.setuid(cmd)
+    local f = io.popen(APP_PATH..'/setuid /usr/bin/env '..cmd..' 2>&1', 'r')
+    local s = f:read('*a')
+    local rc = {f:close()}
+    return s, rc[3]
 end
 
 
