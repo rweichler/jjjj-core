@@ -3,11 +3,11 @@
 _G.BROWSECONTROLLER = objc.UINavigationController:alloc():initWithRootViewController(VIEWCONTROLLER(function(m)
     m:view():setBackgroundColor(objc.UIColor:whiteColor())
 
-    local url = 'http://reddit.com/r/iOS_Jailbreak'
-    local webview = objc.UIWebView:alloc():initWithFrame(m:view():bounds())
-    local request = objc.NSURLRequest:requestWithURL(objc.NSURL:URLWithString(url))
-    webview:loadRequest(request)
-    m:view():addSubview(webview)
+    local label = objc.UILabel:alloc():initWithFrame{{20, 20 + NAVHEIGHT()},{SCREEN.WIDTH - 40, 100}}
+    label:setText('TODO: put an integrated /r/jailbreak browser here... or something')
+    label:setNumberOfLines(0)
+    label:sizeToFit()
+    m:view():addSubview(label)
 end, 'Browse'))
 local path = RES_PATH..'/globe.png'
 BROWSECONTROLLER:tabBarItem():setImage(objc.UIImage:imageWithContentsOfFile(path))
