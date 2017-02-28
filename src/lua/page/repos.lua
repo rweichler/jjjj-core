@@ -20,18 +20,7 @@ _G.REPOCONTROLLER = objc.UINavigationController:alloc():initWithRootViewControll
         'http://apt.modmyi.com/',
     }
 
-    local pirate = {
-        'http://repo.biteyourapple.net/',
-        'http://repo.hackyouriphone.org/',
-        'http://repo.insanelyi.com/',
-        'http://repo.xarold.com/',
-    }
-
     Repo.List(MASTER_REPO_LIST, function(repos)
-        for _,url in pairs(pirate) do
-            table.insert(repos, 1, Repo:new(url))
-        end
-
         function tbl:search(text, item)
             local function find(s)
                 if s then
