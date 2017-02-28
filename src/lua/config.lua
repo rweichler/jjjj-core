@@ -1,4 +1,4 @@
-CACHE_DIR = '/var/lib/dpkg.app'
+CACHE_DIR = '/var/lib/jjjj'
 RES_PATH = PATH..'/res'
 
 

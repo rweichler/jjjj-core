@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>dpkg.exe</string>
+    <string>jjjj.exe</string>
     <key>CFBundleIdentifier</key>
-    <string>dpkg.app.lol</string>
+    <string>com.r333d.jjjj</string>
     <key>CFBundleName</key>
     <string>jjjj</string>
 
@@ -13,10 +13,10 @@
     <array>
         <dict>
             <key>CFBundleURLName</key>
-            <string>dpkg.app</string>
+            <string>com.r333d.jjjj</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>dpkgapp</string>
+                <string>jjjj</string>
             </array>
         </dict>
     </array>

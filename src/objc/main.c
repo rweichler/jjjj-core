@@ -7,14 +7,16 @@
 #include <unistd.h>
 #include <string.h>
 
-#define LOG_PREFIX "deepkg.app"
+#define LOG_PREFIX "jjjjlua"
 #define log(fmt, ...) syslog(LOG_WARNING, LOG_PREFIX": "fmt, ## __VA_ARGS__)
 
+// TODO: figure out why i cant just call syslog through the ffi (probably easy)
 void dpkg_syslog(const char *str)
 {
     log("%s", str);
 }
 
+// TODO: move traceback stuff into Lua and wrap init.lua in an xpcall (easy)
 static int l_traceback(lua_State *L) {
     lua_getfield(L, LUA_GLOBALSINDEX, "debug");
     lua_getfield(L, -1, "traceback");
@@ -24,6 +26,8 @@ static int l_traceback(lua_State *L) {
     return 1;
 }
 
+// TODO: remove main, and have the bundle executable be a Lua script (with #!/usr/bin/env luajit at the top), which
+// then loads all of the necessary C libs (medium difficulty? idk.)
 int main(int argc, char *argv[])
 {
     bool success;
@@ -32,9 +36,11 @@ int main(int argc, char *argv[])
     luaL_openlibs(L);
     lua_pushcfunction(L, l_traceback);
 
-    lua_pushstring(L, DPKGAPP_LUA_PATH);
+    lua_pushstring(L, JJJJ_LUA_PATH);
     lua_setglobal(L, "PATH");
-    success = luaL_loadfile(L, DPKGAPP_LUA_PATH"/init.lua") == 0;
+    lua_pushstring(L, JJJJ_APP_PATH);
+    lua_setglobal(L, "APP_PATH");
+    success = luaL_loadfile(L, JJJJ_LUA_PATH"/init.lua") == 0;
     if(!success) {
         log("Lua error: %s", lua_tostring(L, -1));
         return 1;
@@ -43,6 +49,9 @@ int main(int argc, char *argv[])
     lua_pushlightuserdata(L, argv);
     success = lua_pcall(L, 2, 1, 1) == 0;
     if(!success) {
+        // this is so i can do
+        // ondeviceconsole | grep jjjj
+        // and have it still get newlines
         const char *err = lua_tostring(L, -1);
         static const char *repl = "\n"LOG_PREFIX":  ";
         char buf[strlen(err)*strlen(repl) + 1];

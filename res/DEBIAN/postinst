@@ -1,4 +1,4 @@
 #!/bin/sh
 #set permissions of setuid binary
-chown root:wheel /usr/bin/setuid
-chmod 6755 /usr/bin/setuid
+chown root:wheel /Applications/jjjj.app/setuid
+chmod 6755 /Applications/jjjj.app/setuid

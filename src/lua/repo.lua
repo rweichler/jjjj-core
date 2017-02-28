@@ -38,7 +38,7 @@ local HOME = CACHE_DIR..'/repos'
 
 local function import_lua_table(self, callback, ext)
     callback('Importing to Lua table...')
-    C.pipeit('setuid /bin/rm -f '..self.path..ext, function(line, status)
+    Cmd('rm -f '..self.path..ext, function(line, status)
         if line == ffi.NULL then
             self.debs = Deb.List(self.path)
             for k, deb in ipairs(self.debs) do
@@ -89,6 +89,7 @@ function Repo:getpackages(callback, ext)
     dl.url = (self.packagesurl or self.url)..'Packages'..ext
     dl.download = true
     function dl.handler(_, path, percent, errcode)
+        print('dl handler??')
         if errcode then
             if errcode == 404 then
                 if ext == '.bz2' then
@@ -123,12 +124,12 @@ function Repo:getpackages(callback, ext)
             callback('Extracting...')
             local cmd
             if map[ext] then
-                cmd = 'setuid '..map[ext]..' '..self.path..ext
+                cmd = map[ext]..' '..self.path..ext
             else
-                cmd = 'setuid /bin/cp '..self.path..ext..' '..self.path
+                cmd = 'cp '..self.path..ext..' '..self.path
             end
             local result = ''
-            C.pipeit(cmd, function(line, status)
+            Cmd(cmd, function(line, status)
                 if line == ffi.NULL then
                     if status == 0 then
                         import_lua_table(self, callback, ext)

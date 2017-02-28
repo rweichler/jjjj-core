@@ -131,7 +131,7 @@ function Depiction:checksubstrate()
                 local ps = os.capture('ps aux | grep SpringBoard')
                 local pid = string.match(ps, 'mobile%s+(%d+).*%s+/System/Library/CoreServices/SpringBoard%.app/SpringBoard')
                 local result = ''
-                C.pipeit('setuid /usr/bin/cynject '..pid..' '..SUBSTRATE_DIR..'/'..tweak.name..'.dylib', function(str, status)
+                Cmd('cynject '..pid..' '..SUBSTRATE_DIR..'/'..tweak.name..'.dylib', function(str, status)
                     if str == ffi.NULL then
                         if status == 0 then
                         else

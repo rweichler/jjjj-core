@@ -124,7 +124,7 @@ function Deb:init(path)
 end
 
 function Deb:uninstall(f)
-    C.pipeit('setuid /usr/bin/dpkg --remove '..self.Package, function(str, status)
+    Cmd('dpkg --remove '..self.Package, function(str, status)
         if str == ffi.NULL and status == 0 then
             self.installed = false
         end
@@ -133,7 +133,7 @@ function Deb:uninstall(f)
 end
 
 function Deb:install(f)
-    C.pipeit('setuid /usr/bin/dpkg -i '..self.path, function(str, status)
+    Cmd('dpkg -i '..self.path, function(str, status)
         if str == ffi.NULL and status == 0 then
             self.installed = true
         end

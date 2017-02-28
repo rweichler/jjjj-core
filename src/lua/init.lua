@@ -18,6 +18,10 @@ objc = require 'objc'
 require 'util'
 require 'cdef'
 
+function Cmd(cmd, f)
+    C.pipeit(APP_PATH..'/setuid /usr/bin/env '..cmd, f)
+end
+
 function HOOK(t, k, hook)
     local orig = t[k]
     if not(type(orig) == 'function') then

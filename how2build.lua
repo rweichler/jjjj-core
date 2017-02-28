@@ -1,23 +1,23 @@
 local deb = debber()
 deb.packageinfo = {
-    Package = 'dpkg.app',
-    Name = 'dpkg.app',
-    Version = '0.1',
+    Package = 'jjjj',
+    Name = 'jjjj',
+    Version = '0.1~alpha1',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), mobilesubstrate, dpkg, cydia, wget, bash, ws.hbang.libopener',
-    Description = 'GUI for dpkg',
-    Maintainer = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
-    Author = 'r333d <rweichler+cydia+dpkgapp@gmail.com>',
-    Section = 'Tweaks',
+    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, luajit',--, ws.hbang.libopener',
+    Description = 'Repo manager',
+    Author = 'LUA KING',
+    Section = 'Packaging',
 }
 deb.input = 'layout'
-deb.output = 'dpkgapp.deb'
+deb.output = 'jjjj.deb'
 
 function info()
     deb:print_packageinfo()
 end
 
-local LUA_PATH = '/var/lua/dpkg.app'
+local APP_PATH = '/Applications/jjjj.app'
+local LUA_PATH = '/var/lua/jjjj.app'
 
 function default()
     os.pexecute("rm -rf layout")
@@ -47,7 +47,8 @@ function default()
         'Opener'
     }
     b.defines = {
-        DPKGAPP_LUA_PATH = '"'..LUA_PATH..'"',
+        JJJJ_LUA_PATH = '"'..LUA_PATH..'"',
+        JJJJ_APP_PATH = '"'..APP_PATH..'"',
     }
     b.libraries = {
         'luajit-5.1.2',
@@ -57,9 +58,9 @@ function default()
         fs.find('src/objc', '*.m'),
         fs.find('src/objc', '*.c')
     )
-    b.output = 'layout/Applications/dpkg.app/dpkg.exe'
+    b.output = 'layout'..APP_PATH..'/jjjj.exe'
     b:link(b:compile())
-    os.pexecute('cp -r res/app/* layout/Applications/dpkg.app/')
+    os.pexecute('cp -r res/app/* layout'..APP_PATH..'/')
 
     -- opener
     b.src = table.merge(
@@ -70,15 +71,15 @@ function default()
         'Opener',
         'Foundation',
     }
-    b.output = 'layout/Library/Opener/DpkgOpener.bundle/DpkgOpener'
+    b.output = 'layout/Library/Opener/jjjjOpener.bundle/jjjjOpener'
     b.is_making_dylib = true
     b:link(b:compile())
     b.is_making_dylib = nil
-    os.pexecute('cp res/opener/* layout/Library/Opener/DpkgOpener.bundle/')
+    os.pexecute('cp res/opener/* layout/Library/Opener/jjjjOpener.bundle/')
 
     -- setuid
     b.src = 'src/setuid/main.c'
-    b.output = 'layout/usr/bin/setuid'
+    b.output = 'layout'..APP_PATH..'/setuid'
     b:link(b:compile())
 
     -- Lua

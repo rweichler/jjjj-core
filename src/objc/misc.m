@@ -1,5 +1,64 @@
 #import <UIKit/UIKit.h>
-#import "alert.h"
+
+// TODO: figure out a better interface for this
+static dispatch_queue_t queue = NULL;
+void pipeit(const char *cmd, void (*callback)(const char *, int))
+{
+    if(queue == NULL) {
+        queue = dispatch_queue_create("OISDJFDSOI", NULL);
+    }
+    dispatch_queue_t oldQueue = dispatch_get_current_queue();
+    dispatch_async(queue, ^{
+
+        FILE *fp;
+        char path[1035];
+
+        static const char *suffix = " 2>&1";
+        char realcmd[strlen(cmd) + strlen(suffix) + 1];
+        strcpy(realcmd, cmd);
+        strcat(realcmd, suffix);
+        fp = popen(realcmd, "r");
+        if (fp == NULL) {
+            printf("Failed to run command\n" );
+            exit(1);
+        }
+
+        while (fgets(path, sizeof(path)-1, fp) != NULL) {
+            char *tmp = malloc(strlen(path) + 1);
+            strcpy(tmp, path);
+            dispatch_async(oldQueue, ^{
+                callback(tmp, 0);
+                free(tmp);
+            });
+        }
+
+        int status = pclose(fp) / 256;
+        dispatch_async(oldQueue, ^{
+            callback(NULL, status);
+        });
+    });
+}
+
+// TODO: fix static method calls in objc.lua so this becomes unnecessary (hard)
+void animateit(float duration, float delay, int options, void (*animations)(), void (*completion)(bool))
+{
+    [UIView animateWithDuration:duration
+                          delay:delay
+                        options:options
+                     animations:^{
+                         animations();
+                     }
+                     completion:^(BOOL finished){
+                         completion(finished);
+                     }
+    ];
+}
+
+// TODO: convert these alert functions to Lua (easy, look at ui/table.lua)
+typedef void (*alert_callback_t)();
+typedef void (*alert_input_callback_t)(const char *response);
+void alert_display(const char *title, const char *msg, const char *cancel, const char *ok, alert_callback_t callback);
+void alert_input(const char *title, const char *msg, const char *cancel, const char *ok, alert_input_callback_t callback);
 
 @interface EQEAlertView: UIAlertView<UIAlertViewDelegate>
 {
@@ -66,58 +125,4 @@ void alert_input(const char *title, const char *msg, const char *cancel, const c
     view.delegate = view;
     view->_callback = callback;
     [view show];
-}
-
-static dispatch_queue_t queue = NULL;
-void pipeit(const char *cmd, void (*callback)(const char *, int))
-{
-    if(queue == NULL) {
-        queue = dispatch_queue_create("OISDJFDSOI", NULL);
-    }
-    dispatch_queue_t oldQueue = dispatch_get_current_queue();
-    dispatch_async(queue, ^{
-
-        FILE *fp;
-        char path[1035];
-
-        /* Open the command for reading. */
-        static const char *suffix = " 2>&1";
-        char realcmd[strlen(cmd) + strlen(suffix) + 1];
-        strcpy(realcmd, cmd);
-        strcat(realcmd, suffix);
-        fp = popen(realcmd, "r");
-        if (fp == NULL) {
-            printf("Failed to run command\n" );
-            exit(1);
-        }
-
-        /* Read the output a line at a time - output it. */
-        while (fgets(path, sizeof(path)-1, fp) != NULL) {
-            char *tmp = malloc(strlen(path) + 1);
-            strcpy(tmp, path);
-            dispatch_async(oldQueue, ^{
-                callback(tmp, 0);
-                free(tmp);
-            });
-        }
-        /* close */
-        int status = pclose(fp) / 256;
-        dispatch_async(oldQueue, ^{
-            callback(NULL, status);
-        });
-    });
-}
-
-void animateit(float duration, float delay, int options, void (*animations)(), void (*completion)(bool))
-{
-    [UIView animateWithDuration:duration
-                          delay:delay
-                        options:options
-                     animations:^{
-                         animations();
-                     }
-                     completion:^(BOOL finished){
-                         completion(finished);
-                     }
-    ];
 }
