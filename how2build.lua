@@ -2,9 +2,10 @@ local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
     Name = 'jjjj (Alpha)',
-    Version = '0.1~alpha4',
+    Version = '0.1~alpha4.3',
     Architecture = 'iphoneos-arm',
     Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
+    Depiction = 'http://cydia.r333d.com/view/jjjj',
     Description = 'Repo manager',
     Author = 'LUA KING',
     Section = 'Packaging',
