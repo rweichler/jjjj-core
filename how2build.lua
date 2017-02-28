@@ -1,7 +1,7 @@
 local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
-    Name = 'jjjj',
+    Name = 'jjjj (Alpha)',
     Version = '0.1~alpha1',
     Architecture = 'iphoneos-arm',
     Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
