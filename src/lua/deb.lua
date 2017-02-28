@@ -79,6 +79,15 @@ function Deb:gettweaks()
     return tweaks
 end
 
+function Deb:hasapp()
+    for k,path in ipairs(self:getfiles()) do
+        if string.match(path, '(/Applications/.+%.app/Info.plist)') then
+            return true
+        end
+    end
+    return false
+end
+
 local control_dir = '/var/tmp/dpkgappcontrol'
 function Deb:init(path)
     local function cleanup()

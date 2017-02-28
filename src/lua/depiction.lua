@@ -144,6 +144,21 @@ function Depiction:checksubstrate()
             end)
         end
     end
+
+    if self.deb:hasapp() then
+        C.alert_display('App detected', 'Would you like to run uicache? If not, the app will not show up on the homescreen until your reboot.', 'No', 'uicache', function()
+            C.alert_display('Running uicache', "This app may crash in a few seconds. Don't worry, everything will be fine.", 'Uhh... okay?', nil, nil)
+            Cmd('su -c uicache mobile', function(line, status)
+                if line == ffi.NULL then
+                    if status == 0 then
+                        C.alert_display('Done running uicache', 'The app will probably crash now.', ':(', nil, nil)
+                    else
+                        C.alert_display('Could not run uicache', "This shouldn't happen. Something is wrong with your setup.", 'Dismiss', nil, nil)
+                    end
+                end
+            end)
+        end)
+    end
 end
 
 function Depiction:addbutton(m, appendtext)

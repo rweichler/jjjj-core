@@ -4,7 +4,7 @@ deb.packageinfo = {
     Name = 'jjjj',
     Version = '0.1~alpha1',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, luajit',--, ws.hbang.libopener',
+    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
     Description = 'Repo manager',
     Author = 'LUA KING',
     Section = 'Packaging',
