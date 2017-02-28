@@ -2,7 +2,7 @@ local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
     Name = 'jjjj (Alpha)',
-    Version = '0.1~alpha1',
+    Version = '0.1~alpha4',
     Architecture = 'iphoneos-arm',
     Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
     Description = 'Repo manager',
@@ -44,7 +44,7 @@ function default()
         'UIKit',
         'CoreGraphics',
         'QuartzCore',
-        'Opener'
+        --'Opener',
     }
     b.defines = {
         JJJJ_LUA_PATH = '"'..LUA_PATH..'"',
@@ -78,6 +78,8 @@ function default()
     os.pexecute('cp res/opener/* layout/Library/Opener/jjjjOpener.bundle/')
 
     -- setuid
+    b.frameworks = {}
+    b.libraries = {}
     b.src = 'src/setuid/main.c'
     b.output = 'layout'..APP_PATH..'/setuid'
     b:link(b:compile())
