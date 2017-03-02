@@ -2,7 +2,7 @@ local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
     Name = 'jjjj (Alpha)',
-    Version = '0.1~alpha4.3',
+    Version = '0.1~alpha4.5',
     Architecture = 'iphoneos-arm',
     Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
     Depiction = 'http://cydia.r333d.com/view/jjjj',
@@ -31,6 +31,7 @@ function default()
     b.build_dir = 'build'
     b.include_dirs = {
         'deps/include',
+        'deps/jetfire',
     }
     b.archs = {
         'armv7',
@@ -45,6 +46,8 @@ function default()
         'UIKit',
         'CoreGraphics',
         'QuartzCore',
+        'CFNetwork',
+        'Security',
         --'Opener',
     }
     b.defines = {
@@ -55,12 +58,16 @@ function default()
         'luajit-5.1.2',
         'substrate',
     }
+    b.output = 'layout'..APP_PATH..'/jjjj.exe'
+    b.src = fs.find('deps/jetfire', '*.m')
+    b.cflags = '-fobjc-arc'
+    local jetfire = b:compile()
+    b.cflags = nil
     b.src = table.merge(
         fs.find('src/objc', '*.m'),
         fs.find('src/objc', '*.c')
     )
-    b.output = 'layout'..APP_PATH..'/jjjj.exe'
-    b:link(b:compile())
+    b:link(table.merge(b:compile(), jetfire))
     os.pexecute('cp -r res/app/* layout'..APP_PATH..'/')
 
     -- opener
