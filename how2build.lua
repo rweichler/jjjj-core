@@ -1,3 +1,5 @@
+local USE_LUCY_SERVER
+
 local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
@@ -54,6 +56,9 @@ function default()
         JJJJ_LUA_PATH = '"'..LUA_PATH..'"',
         JJJJ_APP_PATH = '"'..APP_PATH..'"',
     }
+    if USE_LUCY_SERVER then
+        b.defines[#b.defines + 1] = 'USE_LUCY_SERVER'
+    end
     b.libraries = {
         'luajit-5.1.2',
         'substrate',

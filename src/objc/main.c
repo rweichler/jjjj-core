@@ -36,6 +36,13 @@ int main(int argc, char *argv[])
     luaL_openlibs(L);
     lua_pushcfunction(L, l_traceback);
 
+#ifdef USE_LUCY_SERVER
+    void server_start();
+    void start_lua(lua_State *);
+    server_start();
+    start_lua(L);
+#endif
+
     lua_pushstring(L, JJJJ_LUA_PATH);
     lua_setglobal(L, "PATH");
     lua_pushstring(L, JJJJ_APP_PATH);
