@@ -3,8 +3,8 @@ local USE_LUCY_SERVER
 local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
-    Name = 'jjjj (Alpha)',
-    Version = '0.1~alpha4.7.2',
+    Name = 'jjjj (Cydia alternative)',
+    Version = '0.1~alpha4.7.3',
     Architecture = 'iphoneos-arm',
     Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
     Depiction = 'http://cydia.r333d.com/view/jjjj',
