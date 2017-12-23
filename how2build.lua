@@ -41,7 +41,7 @@ function default()
     b.library_dirs = {
         'deps/lib',
     }
-    b.sflags = '-Fdeps/Frameworks -mios-version-min=7.0'
+    b.sflags = '-mios-version-min=7.0'
     b.frameworks = {
         'Foundation',
         'UIKit',
@@ -56,7 +56,7 @@ function default()
         b.defines[#b.defines + 1] = 'USE_LUCY_SERVER'
     end
     b.libraries = {
-        'luajit-5.1.2',
+        'luajit',
     }
     b.output = 'layout'..APP_PATH..'/jjjj.exe'
     b.cflags = '-fobjc-arc'
