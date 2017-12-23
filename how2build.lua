@@ -6,7 +6,7 @@ deb.packageinfo = {
     Name = 'jjjj (Cydia alternative)',
     Version = '0.1~alpha4.7.3',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',--, ws.hbang.libopener',
+    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',
     Depiction = 'http://cydia.r333d.com/view/jjjj',
     Description = 'Repo manager',
     Author = 'LUA KING',
@@ -20,7 +20,7 @@ function info()
 end
 
 local APP_PATH = '/Applications/jjjj.app'
-local LUA_PATH = '/var/lua/jjjj.app'
+local LUA_PATH = '/var/tweak/com.r333d.jjjj/lua'
 
 function default()
     os.pexecute("rm -rf layout")
@@ -57,7 +57,6 @@ function default()
     end
     b.libraries = {
         'luajit-5.1.2',
-        'substrate',
     }
     b.output = 'layout'..APP_PATH..'/jjjj.exe'
     b.cflags = '-fobjc-arc'
@@ -68,21 +67,6 @@ function default()
     )
     b:link(b:compile())
     os.pexecute('cp -r res/app/* layout'..APP_PATH..'/')
-
-    -- opener
-    b.src = table.merge(
-        fs.find('src/opener', '*.m'),
-        fs.find('src/opener', '*.c')
-    )
-    b.frameworks = {
-        'Opener',
-        'Foundation',
-    }
-    b.output = 'layout/Library/Opener/jjjjOpener.bundle/jjjjOpener'
-    b.is_making_dylib = true
-    b:link(b:compile())
-    b.is_making_dylib = nil
-    os.pexecute('cp res/opener/* layout/Library/Opener/jjjjOpener.bundle/')
 
     -- setuid
     b.frameworks = {}
