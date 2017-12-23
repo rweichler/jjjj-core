@@ -33,7 +33,6 @@ function default()
     b.build_dir = 'build'
     b.include_dirs = {
         'deps/include',
-        'deps/jetfire',
     }
     b.archs = {
         'armv7',
@@ -48,9 +47,6 @@ function default()
         'UIKit',
         'CoreGraphics',
         'QuartzCore',
-        'CFNetwork',
-        'Security',
-        --'Opener',
     }
     b.defines = {
         JJJJ_LUA_PATH = '"'..LUA_PATH..'"',
@@ -64,15 +60,13 @@ function default()
         'substrate',
     }
     b.output = 'layout'..APP_PATH..'/jjjj.exe'
-    b.src = fs.find('deps/jetfire', '*.m')
     b.cflags = '-fobjc-arc'
-    local jetfire = b:compile()
     b.cflags = nil
     b.src = table.merge(
         fs.find('src/objc', '*.m'),
         fs.find('src/objc', '*.c')
     )
-    b:link(table.merge(b:compile(), jetfire))
+    b:link(b:compile())
     os.pexecute('cp -r res/app/* layout'..APP_PATH..'/')
 
     -- opener
