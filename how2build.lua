@@ -3,13 +3,13 @@ local USE_LUCY_SERVER
 local deb = debber()
 deb.packageinfo = {
     Package = 'jjjj',
-    Name = 'jjjj (Cydia alternative)',
-    Version = '0.1~alpha4.7.3',
+    Name = 'jjjj',
+    Version = '0.1~alpha4.7.4',
     Architecture = 'iphoneos-arm',
-    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils, luajit',
+    Depends = 'firmware (>= 5.0), dpkg, bzip2, gzip, cydia, coreutils',
     Depiction = 'http://cydia.r333d.com/view/jjjj',
     Description = 'Repo manager',
-    Author = 'LUA KING',
+    Author = 'r333d <rweichler+cydia@gmail.com>',
     Section = 'Packaging',
 }
 deb.input = 'layout'
