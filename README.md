@@ -8,10 +8,10 @@ If to build this, just compile all of the files in src/objc/ somehow, then stick
 
 You can also try using aite, which is my build system.
 
-Just run these commands:
+Just run these commands (need to be on a Mac, with LuaJIT and ldid installed):
 
 ```
-git clone https://github.com/rweichler/jjjj-core
+git clone --recursive https://github.com/rweichler/jjjj-core
 git clone https://github.com/rweichler/aite
 cd jjjj-core
 ../aite/main.lua
